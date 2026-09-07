@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#00071a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="PoKoalaShop">
+<meta name="apple-mobile-web-app-title" content="PKS Dev">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>PoKoalaShop</title>
+<title>PoKoalaShop DEV</title>
 <style>
 :root{
 --bg:#00071a;--surf:#0b1430;--surf2:#152045;--surf3:#202c58;
@@ -287,6 +287,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
   #view{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
 }
 .tagBox{background:var(--surf2);border-radius:var(--r2);padding:11px 12px;font-size:12px;color:var(--tx2);line-height:1.55;margin:0 18px 12px;word-break:break-word;max-height:130px;overflow-y:auto}
+.devTag{background:#E3350D;color:#fff;font-weight:900;font-size:10px;letter-spacing:1px;padding:2px 6px;border-radius:4px;margin-left:8px;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -301,7 +302,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 <div id="app" class="hide">
   <header>
     <div class="hTop">
-      <div class="brand"><img src="icons/logo.png" alt=""><div class="wm"><span class="p">Po</span><span class="k">Koala</span><span class="s">Shop</span></div></div>
+      <div class="brand"><img src="icons/logo.png" alt=""><div class="wm"><span class="p">Po</span><span class="k">Koala</span><span class="s">Shop</span></div><span class="devTag">DEV</span></div>
       <div class="hRight">
         <div class="sync"><span class="syncDot" id="syncDot"></span><span id="syncTx"></span></div>
         <button class="iBtn" id="btnTags" title="Hashtags">#</button>
@@ -356,12 +357,13 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 
 <script>
 'use strict';
-var APP_VERSION = '2.34';
+var APP_VERSION = '2.34d1';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
-var PREFIX = 'pks_';
+var PREFIX = 'dvp_';
+var LS = 'dvl_';
 var POLL_MS = 12000;
-var BAK_PREFIX = 'bak_';
+var BAK_PREFIX = 'dvb_';
 var BAK_KEEP = 10;
 var BAK_EVERY = 6 * 3600 * 1000;
 var REFRESH_MARGIN = 5 * 60 * 1000;
@@ -373,9 +375,9 @@ var tab = 'vitrine';
 var sortKey = 'date', sortDir = -1;
 var boxFilter = null;
 var groupBy = 'poke';
-try{ var _g = localStorage.getItem('pks_group'); if(_g === 'ach' || _g === 'poke') groupBy = _g; }catch(e){}
+try{ var _g = localStorage.getItem(LS + 'group'); if(_g === 'ach' || _g === 'poke') groupBy = _g; }catch(e){}
 var selMode = false, sel = {}, suppressClick = false, lpTimer = null, lpX = 0, lpY = 0, lpId = null, lpFired = false;
-try{ var _s = JSON.parse(localStorage.getItem('pks_sort') || 'null'); if(_s){ sortKey = _s.k; sortDir = _s.d; } }catch(e){}
+try{ var _s = JSON.parse(localStorage.getItem(LS + 'sort') || 'null'); if(_s){ sortKey = _s.k; sortDir = _s.d; } }catch(e){}
 var token = null, tokenExp = 0, tokenClient = null;
 var me = null, myFile = null, myFileId = null;
 var who = null;
@@ -448,7 +450,7 @@ function closeCfm(){ $('cfm').classList.remove('on'); cfmCb = null; }
 var idb = null;
 function openIdb(){
   return new Promise(function(res){
-    var r = indexedDB.open('pokoalashop', 1);
+    var r = indexedDB.open('pokoalashopdev', 1);
     r.onupgradeneeded = function(e){
       var db = e.target.result;
       if(!db.objectStoreNames.contains('ph')) db.createObjectStore('ph');
@@ -474,7 +476,7 @@ function idbPut(k, v){
 }
 
 /* ═══ CACHE LOCAL ═══ */
-function cacheKey(){ return 'pks_cache_' + (who || 'x'); }
+function cacheKey(){ return LS + 'cache_' + (who || 'x'); }
 function saveCache(){
   try{ localStorage.setItem(cacheKey(), JSON.stringify({ at: Date.now(), lots: lots })); }catch(e){}
 }
@@ -494,7 +496,7 @@ function initGis(){
       if(r.error){ toast('Connexion refusée'); return; }
       token = r.access_token;
       tokenExp = Date.now() + (parseInt(r.expires_in,10) || 3500) * 1000;
-      try{ localStorage.setItem('pks_tk', JSON.stringify({ t: token, e: tokenExp })); }catch(e){}
+      try{ localStorage.setItem(LS + 'tk', JSON.stringify({ t: token, e: tokenExp })); }catch(e){}
       offline = false;
       scheduleRefresh();
       if(booted){ setSync('busy'); sync(false); }
@@ -530,7 +532,7 @@ function api(url, opts){
   return fetch(url, opts).then(function(r){
     if(r.status === 401){
       token = null;
-      try{ localStorage.removeItem('pks_tk'); }catch(e){}
+      try{ localStorage.removeItem(LS + 'tk'); }catch(e){}
       reauth(); throw new Error('auth');
     }
     return r;
@@ -543,7 +545,7 @@ function api(url, opts){
 async function start(){
   await openIdb();
   who = null;
-  try{ who = localStorage.getItem('pks_who'); }catch(e){}
+  try{ who = localStorage.getItem(LS + 'who'); }catch(e){}
   if(!who || !WHOS[who]){
     if(tokenValid()){
       try{ var r = await api('https://www.googleapis.com/oauth2/v3/userinfo'); me = await r.json(); }catch(e){}
@@ -576,7 +578,7 @@ function askWho(){
   for(var i=0;i<b.length;i++){
     b[i].onclick = function(){
       who = this.getAttribute('data-who');
-      localStorage.setItem('pks_who', who);
+      localStorage.setItem(LS + 'who', who);
       closeSheet(); boot();
     };
   }
@@ -819,7 +821,7 @@ async function listBackups(){
 async function makeBackup(force){
   if(!lots.length) return;
   var last = 0;
-  try{ last = parseInt(localStorage.getItem('pks_lastbak') || '0', 10); }catch(e){}
+  try{ last = parseInt(localStorage.getItem(LS + 'lastbak') || '0', 10); }catch(e){}
   if(!force && Date.now() - last < BAK_EVERY) return;
   var body = JSON.stringify({ v: APP_VERSION, who: who, at: now(), count: lots.length, lots: lots });
   var meta = { name: BAK_PREFIX + who + '_' + Date.now() + '.json', parents: ['appDataFolder'] };
@@ -827,7 +829,7 @@ async function makeBackup(force){
   fd.append('metadata', new Blob([JSON.stringify(meta)], { type:'application/json' }));
   fd.append('file', new Blob([body], { type:'application/json' }));
   await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method:'POST', body: fd });
-  try{ localStorage.setItem('pks_lastbak', String(Date.now())); }catch(e){}
+  try{ localStorage.setItem(LS + 'lastbak', String(Date.now())); }catch(e){}
   await pruneBackups();
 }
 
@@ -1833,7 +1835,7 @@ function sheetAcc(){
       var w = this.getAttribute('data-sw');
       if(w === who) return;
       who = w;
-      try{ localStorage.setItem('pks_who', w); }catch(e){}
+      try{ localStorage.setItem(LS + 'who', w); }catch(e){}
       savedLots = {}; myFileId = null;
       closeSheet(); boot(); toast('Identité : ' + WHOS[w]);
     };
@@ -1852,7 +1854,7 @@ function sheetAcc(){
   $('k7').onclick = function(){
     confirmBox('Se déconnecter ?', 'Tes données restent sur Drive.', 'Déconnexion', function(){
       if(token) google.accounts.oauth2.revoke(token, function(){});
-      try{ localStorage.removeItem('pks_tk'); localStorage.removeItem(cacheKey()); }catch(e){}
+      try{ localStorage.removeItem(LS + 'tk'); localStorage.removeItem(cacheKey()); }catch(e){}
       clearInterval(pollTimer); clearTimeout(refreshTimer);
       booted = false;
       token = null; lots = []; savedLots = {};
@@ -1974,7 +1976,7 @@ document.addEventListener('click', function(e){
     var v2 = gb.getAttribute('data-gb');
     if(v2 !== groupBy){
       groupBy = v2;
-      try{ localStorage.setItem('pks_group', v2); }catch(err){}
+      try{ localStorage.setItem(LS + 'group', v2); }catch(err){}
       render();
     }
     return;
@@ -1992,7 +1994,7 @@ document.addEventListener('click', function(e){
     var k = s.getAttribute('data-sort');
     if(k === sortKey) sortDir = -sortDir;
     else { sortKey = k; sortDir = (k === 'alpha') ? 1 : -1; }
-    try{ localStorage.setItem('pks_sort', JSON.stringify({ k: sortKey, d: sortDir })); }catch(err){}
+    try{ localStorage.setItem(LS + 'sort', JSON.stringify({ k: sortKey, d: sortDir })); }catch(err){}
     render();
     return;
   }
@@ -2086,14 +2088,14 @@ window.addEventListener('load', function(){
   s.onload = function(){
     initGis();
     var st = null;
-    try{ st = JSON.parse(localStorage.getItem('pks_tk') || 'null'); }catch(e){}
+    try{ st = JSON.parse(localStorage.getItem(LS + 'tk') || 'null'); }catch(e){}
     if(st && st.t && st.e > Date.now() + 60000){
       token = st.t; tokenExp = st.e;
       start();
       return;
     }
     var w = null;
-    try{ w = localStorage.getItem('pks_who'); }catch(e){}
+    try{ w = localStorage.getItem(LS + 'who'); }catch(e){}
     if(w && WHOS[w]){
       start();
       setTimeout(reauth, 150);
