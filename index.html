@@ -408,7 +408,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.35d';
+var APP_VERSION = '2.36d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2090,7 +2090,7 @@ for(var n=0;n<navs.length;n++){
     this.classList.add('on');
     tab = this.getAttribute('data-t');
     boxFilter = null;
-    if(tab !== 'stock') stkSet = null;
+    if(tab !== 'stock' && stkSet){ stkSet = null; if(history.state && history.state.d === 3) history.back(); }
     $('fab').classList.toggle('hide', tab !== 'vitrine' && tab !== 'afaire');
     $('q').value = '';
     window.scrollTo(0,0);
@@ -2120,6 +2120,8 @@ window.addEventListener('popstate', function(){
   if($('cfm').classList.contains('on')){ closeCfm(); history.pushState({d:1},''); return; }
   if(sheetOpen){ closeSheet(); history.pushState({d:1},''); return; }
   if(query()){ $('q').value = ''; render(); history.pushState({d:1},''); return; }
+  if(history.state && history.state.d === 3) return;           /* retour sur la grille depuis un panneau */
+  if(tab === 'stock' && stkSet){ stkSet = null; window.scrollTo(0,0); render(); return; }
 });
 var _open = openSheet;
 openSheet = function(h){ _open(h); history.pushState({ d:1 }, ''); };
@@ -2440,8 +2442,16 @@ function stkBind(){
   vw.addEventListener('click', function(e){
     if(tab !== 'stock') return;
     var t;
-    if((t = e.target.closest('[data-stkback]'))){ stkSet = null; window.scrollTo(0,0); render(); return; }
-    if((t = e.target.closest('[data-stkset]'))){ stkSet = t.getAttribute('data-stkset'); window.scrollTo(0,0); render(); return; }
+    if((t = e.target.closest('[data-stkback]'))){
+      if(history.state && history.state.d === 3){ history.back(); }
+      else { stkSet = null; window.scrollTo(0,0); render(); }
+      return;
+    }
+    if((t = e.target.closest('[data-stkset]'))){
+      stkSet = t.getAttribute('data-stkset');
+      history.pushState({ d:3 }, '');
+      window.scrollTo(0,0); render(); return;
+    }
     if((t = e.target.closest('[data-stkv]'))){
       if(stkLpFired){ stkLpFired = false; return; }
       var p = t.getAttribute('data-stkv').split('|');
