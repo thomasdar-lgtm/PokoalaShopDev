@@ -288,6 +288,56 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 }
 .tagBox{background:var(--surf2);border-radius:var(--r2);padding:11px 12px;font-size:12px;color:var(--tx2);line-height:1.55;margin:0 18px 12px;word-break:break-word;max-height:130px;overflow-y:auto}
 body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:#E3350D;z-index:9999;pointer-events:none}
+/* ===== MODULE STOCK ===== */
+.stkBar{display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.stkBack{background:var(--surf);border:1px solid var(--bd);color:var(--tx);border-radius:9px;padding:7px 11px;font-size:13px;font-weight:700;cursor:pointer;flex:none}
+.stkTit{font-weight:800;font-size:15px;line-height:1.2;flex:1;min-width:0}
+.stkTit small{display:block;color:var(--tx3);font-weight:600;font-size:11px;margin-top:2px}
+.stkSet{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:7px;cursor:pointer}
+.stkSet b{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stkSet .sc{font-size:12px;font-weight:800;color:var(--blu);flex:none}
+.stkSet .sc.z{color:var(--tx3);font-weight:600}
+.stkSerie{color:var(--tx3);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin:15px 0 7px}
+.stkGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stkC{background:var(--surf);border:1px solid var(--bd);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.stkC.has{border-color:var(--blu)}
+.stkC .im{position:relative;background:#0c1428;aspect-ratio:245/342}
+.stkC .im img{width:100%;height:100%;object-fit:cover;display:block}
+.stkC .nu{position:absolute;top:3px;left:3px;background:rgba(0,7,26,.82);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px}
+.stkC .na{font-size:10px;font-weight:700;padding:4px 5px 2px;line-height:1.15;height:26px;overflow:hidden}
+.stkC .vs{display:flex;gap:3px;padding:0 4px 5px}
+.stkV{flex:1;border:1px solid var(--bd);background:#0c1428;border-radius:6px;padding:4px 0;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.stkV .vl{display:block;font-size:8px;font-weight:800;color:var(--tx3);letter-spacing:.3px}
+.stkV .vq{display:block;font-size:13px;font-weight:900;line-height:1.1}
+.stkV.q0 .vq{color:var(--tx3);opacity:.45}
+.stkV.on{border-color:var(--blu);background:rgba(56,139,253,.13)}
+.stkV.on .vq{color:var(--blu)}
+.stkDot{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:#d29922;opacity:.85}
+.stkTot{background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:12px;display:flex;gap:16px}
+.stkTot div{flex:1}
+.stkTot span{display:block;font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.stkTot b{font-size:19px;font-weight:900}
+.stkRow{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:9px 11px;margin-bottom:7px;cursor:pointer}
+.stkRow img{width:36px;height:50px;object-fit:cover;border-radius:5px;background:#0c1428;flex:none}
+.stkRow .rt{flex:1;min-width:0}
+.stkRow .rt b{display:block;font-size:13px;font-weight:700}
+.stkRow .rt small{color:var(--tx3);font-size:11px;font-weight:600}
+.stkRow .rq{font-size:15px;font-weight:900;color:var(--blu);flex:none}
+.shV{border:1px solid var(--bd);border-radius:10px;padding:10px 11px;margin-bottom:9px}
+.shV .vh{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:8px}
+.shV .vh em{font-style:normal;color:var(--tx3);font-weight:700;font-size:11px}
+.shE{display:flex;align-items:center;gap:9px;margin-top:6px}
+.shE label{flex:1;font-size:12px;font-weight:600;color:var(--tx2)}
+.shE button{width:31px;height:31px;border-radius:8px;border:1px solid var(--bd);background:#0c1428;color:var(--tx);font-size:16px;font-weight:800;cursor:pointer;flex:none;line-height:1}
+.shE .qv{width:30px;text-align:center;font-size:15px;font-weight:900;flex:none}
+.stkWarn{background:rgba(210,153,34,.11);border:1px solid rgba(210,153,34,.34);color:#d29922;border-radius:9px;padding:8px 11px;font-size:11px;font-weight:600;margin-bottom:11px;line-height:1.4}
+.stkMv{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.stkMv .d{font-weight:900;flex:none;width:32px;text-align:center;border-radius:6px;padding:2px 0}
+.stkMv .d.p{color:#3fb950;background:rgba(63,185,80,.12)}
+.stkMv .d.m{color:#f85149;background:rgba(248,81,73,.12)}
+.stkMv .mt{flex:1;min-width:0}
+.stkMv .mt b{display:block;font-weight:700}
+.stkMv .mt small{color:var(--tx3);font-size:10px}
 </style>
 </head>
 <body>
@@ -330,6 +380,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
     <div class="nv on" data-t="vitrine"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/> <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/> <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></svg>Vitrine</div>
     <div class="nv" data-t="afaire"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8"/> <path d="M13 12h8"/> <path d="M13 19h8"/> <path d="m3 17 2 2 4-4"/> <rect x="3" y="4" width="6" height="6" rx="1"/></svg>À faire<span class="nvB hide" id="nb2"></span></div>
     <div class="nv" data-t="cmd"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/> <path d="m16 17 2 2 4-4"/> <path d="M21 11.127V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l1.32-.753"/> <path d="M3.29 7 12 12l8.71-5"/> <path d="m7.5 4.27 8.997 5.148"/></svg>Commandes<span class="nvB hide" id="nb3"></span></div>
+    <div class="nv" data-t="stock"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M2 7h20v4H2z"/><path d="M10 14h4"/></svg>Stock</div>
     <div class="nv" data-t="histo"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/> <path d="M3 3v5h5"/> <path d="M12 7v5l4 2"/></svg>Historique</div>
   </nav>
 </div>
@@ -357,7 +408,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.34d2';
+var APP_VERSION = '2.35d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -924,6 +975,7 @@ function render(){
   if(tab === 'vitrine') renderVitrine();
   else if(tab === 'afaire') renderAfaire();
   else if(tab === 'cmd') renderCmd();
+  else if(tab === 'stock'){ renderStock(); return; }
   else renderHisto();
   hydratePhotos();
 }
@@ -2038,6 +2090,7 @@ for(var n=0;n<navs.length;n++){
     this.classList.add('on');
     tab = this.getAttribute('data-t');
     boxFilter = null;
+    if(tab !== 'stock') stkSet = null;
     $('fab').classList.toggle('hide', tab !== 'vitrine' && tab !== 'afaire');
     $('q').value = '';
     window.scrollTo(0,0);
@@ -2104,6 +2157,365 @@ window.addEventListener('load', function(){
   document.head.appendChild(s);
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 });
+
+/* ===================== MODULE STOCK ===================== */
+var STK_FILE = 'dvstk.json';
+var VAR_LBL = { n:'Norm', r:'Rev', h:'Holo' };
+var VAR_FULL = { n:'Normale', r:'Reverse', h:'Holo' };
+var VAR_BIT = { n:1, r:2, h:4 };
+var ETS = [['nm','Near Mint'],['jo','Joué'],['ab','Abîmé']];
+var ET_LBL = { nm:'NM', jo:'Joué', ab:'Abîmé' };
+
+var cdb = null, cdbBySet = null, cdbById = null, cdbLoading = false;
+var stock = {}, stkOv = {}, stkMoves = [], stkRev = 0;
+var stkFileId = null, stkBaseRev = 0, stkPending = [];
+var stkTimer = null, stkSaving = false, stkLoaded = false;
+var stkSet = null, stkLp = null, stkLpFired = false;
+
+function stkKey(id, v, e){ return id + '|' + v + '|' + e; }
+function stkQ(id, v, e){ return stock[stkKey(id, v, e)] || 0; }
+function stkVarQ(id, v){ var t = 0; for(var i=0;i<ETS.length;i++) t += stkQ(id, v, ETS[i][0]); return t; }
+function stkCardQ(id){ return stkVarQ(id,'n') + stkVarQ(id,'r') + stkVarQ(id,'h'); }
+
+function stkVars(c){
+  var m = (stkOv[c.i] != null) ? stkOv[c.i] : c.v, r = [];
+  if(m & 1) r.push('n');
+  if(m & 2) r.push('r');
+  if(m & 4) r.push('h');
+  return r.length ? r : ['n'];
+}
+
+/* ---- base de cartes ---- */
+async function cdbLoad(){
+  if(cdb || cdbLoading) return;
+  cdbLoading = true;
+  try{
+    var r = await fetch('./pks_cards.json', { cache:'force-cache' });
+    if(!r.ok) throw new Error('http ' + r.status);
+    cdb = await r.json();
+    cdbBySet = {}; cdbById = {};
+    for(var i=0;i<cdb.cards.length;i++){
+      var c = cdb.cards[i];
+      cdbById[c.i] = c;
+      (cdbBySet[c.s] = cdbBySet[c.s] || []).push(c);
+    }
+    for(var s in cdbBySet){
+      cdbBySet[s].sort(function(a,b){
+        var x = parseInt(a.u,10), y = parseInt(b.u,10);
+        if(isNaN(x) && isNaN(y)) return String(a.u).localeCompare(String(b.u));
+        if(isNaN(x)) return 1;
+        if(isNaN(y)) return -1;
+        return x - y || String(a.u).localeCompare(String(b.u));
+      });
+    }
+  }catch(e){ cdb = null; toast('Base de cartes introuvable'); }
+  cdbLoading = false;
+}
+function cdbImg(c){ return c.g ? c.g + '/low.webp' : ''; }
+
+/* ---- persistance Drive ---- */
+async function stkFind(){
+  var url = 'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=50&fields=files(id,name)&q=' +
+    encodeURIComponent("name = '" + STK_FILE + "' and trashed=false");
+  var r = await api(url);
+  var j = await r.json();
+  return (j.files && j.files[0]) ? j.files[0].id : null;
+}
+function stkApply(data){
+  stock = (data && data.stock) || {};
+  stkOv = (data && data.ov) || {};
+  stkMoves = (data && data.moves) || [];
+  stkRev = (data && data.rev) || 0;
+  stkBaseRev = stkRev;
+}
+async function stkLoad(){
+  if(stkLoaded) return;
+  try{
+    stkFileId = await stkFind();
+    if(stkFileId){
+      var r = await api('https://www.googleapis.com/drive/v3/files/' + stkFileId + '?alt=media');
+      stkApply(await r.json());
+    }
+    stkLoaded = true;
+  }catch(e){ toast('Stock : lecture impossible'); }
+}
+function stkBody(){
+  return JSON.stringify({ rev: stkRev, stock: stock, ov: stkOv, moves: stkMoves, at: now(), v: APP_VERSION });
+}
+async function stkWrite(){
+  var meta = { name: STK_FILE, parents: ['appDataFolder'] };
+  var fd = new FormData();
+  if(!stkFileId){
+    fd.append('metadata', new Blob([JSON.stringify(meta)], { type:'application/json' }));
+    fd.append('file', new Blob([stkBody()], { type:'application/json' }));
+    var r = await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method:'POST', body: fd });
+    stkFileId = (await r.json()).id;
+  } else {
+    await api('https://www.googleapis.com/upload/drive/v3/files/' + stkFileId + '?uploadType=media', {
+      method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: stkBody()
+    });
+  }
+}
+/* garde-fou : si le fichier a bougé ailleurs, on rejoue nos mouvements dessus */
+async function stkSave(){
+  if(stkSaving || !stkPending.length) return;
+  stkSaving = true; setSync('busy');
+  try{
+    if(stkFileId){
+      var r = await api('https://www.googleapis.com/drive/v3/files/' + stkFileId + '?alt=media');
+      var rem = await r.json().catch(function(){ return null; });
+      if(rem && (rem.rev || 0) !== stkBaseRev){
+        var mine = stkPending.slice();
+        stkApply(rem);
+        for(var i=0;i<mine.length;i++){
+          var m = mine[i], k = stkKey(m.c, m.v, m.e);
+          stock[k] = Math.max(0, (stock[k] || 0) + m.d);
+          stkMoves.push(m);
+        }
+        toast('Stock fusionné avec l\'autre appareil');
+      }
+    }
+    stkRev = stkBaseRev + 1;
+    await stkWrite();
+    stkBaseRev = stkRev;
+    stkPending = [];
+    setSync('ok');
+  }catch(e){ setSync('err'); toast('Stock non sauvegardé'); }
+  stkSaving = false;
+  if(stkPending.length) stkQueue();
+}
+function stkQueue(){ clearTimeout(stkTimer); stkTimer = setTimeout(stkSave, 2500); }
+
+function stkAdd(id, v, e, d, src){
+  var k = stkKey(id, v, e), cur = stock[k] || 0, nv = Math.max(0, cur + d);
+  if(nv === cur) return false;
+  stock[k] = nv;
+  if(!nv) delete stock[k];
+  var mv = { t: now(), c: id, v: v, e: e, d: nv - cur, w: who || '', s: src || 'saisie' };
+  stkMoves.push(mv); stkPending.push(mv);
+  stkQueue();
+  return true;
+}
+function stkSetOv(id, mask){
+  if(mask) stkOv[id] = mask; else delete stkOv[id];
+  stkPending.push({ t: now(), c: id, v:'-', e:'-', d:0, w: who || '', s:'variante' });
+  stkQueue();
+}
+
+/* ---- rendu ---- */
+async function renderStock(){
+  if(!cdb){
+    $('view').innerHTML = '<div class="ph">Chargement de la base de cartes…</div>';
+    await cdbLoad();
+    if(!cdb){ $('view').innerHTML = empty(EMPTY_CMD, 'Base de cartes indisponible.'); return; }
+  }
+  if(!stkLoaded){ await stkLoad(); }
+  var q = query();
+  if(q) return stkRenderSearch(q);
+  if(stkSet) return stkRenderGrid();
+  stkRenderSets();
+}
+
+function stkRenderSets(){
+  var tot = 0, uniq = 0;
+  for(var k in stock){ tot += stock[k]; uniq++; }
+  var per = {};
+  for(var k2 in stock){
+    var id = k2.split('|')[0], c = cdbById[id];
+    if(c) per[c.s] = (per[c.s] || 0) + stock[k2];
+  }
+  var h = '<div class="stkTot"><div><span>Cartes en stock</span><b>' + tot + '</b></div>' +
+          '<div><span>Lignes</span><b>' + uniq + '</b></div></div>';
+  var bySerie = {};
+  for(var i=0;i<cdb.sets.length;i++){
+    var s = cdb.sets[i];
+    if(!cdbBySet[s.id]) continue;
+    (bySerie[s.serie || 'Extensions'] = bySerie[s.serie || 'Extensions'] || []).push(s);
+  }
+  var order = Object.keys(bySerie);
+  for(var o=0;o<order.length;o++){
+    h += '<div class="stkSerie">' + esc(order[o]) + '</div>';
+    var arr = bySerie[order[o]];
+    for(var j=0;j<arr.length;j++){
+      var st = arr[j], n = per[st.id] || 0;
+      h += '<div class="stkSet" data-stkset="' + esc(st.id) + '"><b>' + esc(st.name) + '</b>' +
+           '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n + ' cartes' : '—') + '</span></div>';
+    }
+  }
+  $('view').innerHTML = h;
+}
+
+function stkTile(c){
+  var vs = stkVars(c), h = '';
+  h += '<div class="stkC' + (stkCardQ(c.i) ? ' has' : '') + '" data-stkid="' + esc(c.i) + '">';
+  h += '<div class="im"><img loading="lazy" src="' + esc(cdbImg(c)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+       '<span class="nu">' + esc(c.u) + '</span>' + (c.d ? '<span class="stkDot" title="variante déduite"></span>' : '') + '</div>';
+  h += '<div class="na">' + esc(c.n) + '</div><div class="vs">';
+  for(var i=0;i<vs.length;i++){
+    var q = stkVarQ(c.i, vs[i]);
+    h += '<div class="stkV ' + (q ? 'on' : 'q0') + '" data-stkv="' + esc(c.i) + '|' + vs[i] + '">' +
+         '<span class="vl">' + VAR_LBL[vs[i]] + '</span><span class="vq">' + q + '</span></div>';
+  }
+  return h + '</div></div>';
+}
+
+function stkRenderGrid(){
+  var s = null;
+  for(var i=0;i<cdb.sets.length;i++) if(cdb.sets[i].id === stkSet) s = cdb.sets[i];
+  var arr = cdbBySet[stkSet] || [];
+  var tot = 0;
+  for(var j=0;j<arr.length;j++) tot += stkCardQ(arr[j].i);
+  var h = '<div class="stkBar"><button class="stkBack" data-stkback="1">←</button>' +
+          '<div class="stkTit">' + esc(s ? s.name : stkSet) +
+          '<small>' + arr.length + ' cartes · ' + tot + ' en stock</small></div></div>';
+  h += '<div class="stkWarn">Appui court : +1 en NM. Appui long : −1. Touche l\'image pour gérer les états et les variantes.</div>';
+  h += '<div class="stkGrid">';
+  for(var k=0;k<arr.length;k++) h += stkTile(arr[k]);
+  $('view').innerHTML = h + '</div>';
+}
+
+function stkRenderSearch(q){
+  var n = norm(q), res = [];
+  for(var i=0;i<cdb.cards.length && res.length < 400;i++){
+    var c = cdb.cards[i];
+    if(norm(c.n).indexOf(n) >= 0 || norm(c.e).indexOf(n) >= 0) res.push(c);
+  }
+  var withQ = res.filter(function(c){ return stkCardQ(c.i) > 0; });
+  var show = withQ.length ? withQ : res.slice(0, 120);
+  if(!show.length){ $('view').innerHTML = noHit(EMPTY_CMD, 'ce Pokémon'); return; }
+  var bySet = {}, tot = 0;
+  for(var j=0;j<show.length;j++){ (bySet[show[j].s] = bySet[show[j].s] || []).push(show[j]); tot += stkCardQ(show[j].i); }
+  var setName = {};
+  for(var s=0;s<cdb.sets.length;s++) setName[cdb.sets[s].id] = cdb.sets[s].name;
+  var h = '<div class="stkTot"><div><span>' + (withQ.length ? 'En stock' : 'Cartes trouvées') + '</span><b>' +
+          (withQ.length ? tot : show.length) + '</b></div><div><span>Extensions</span><b>' + Object.keys(bySet).length + '</b></div></div>';
+  if(!withQ.length) h += '<div class="stkWarn">Aucun exemplaire en stock pour ce nom. Voici les cartes existantes.</div>';
+  for(var sid in bySet){
+    h += '<div class="stkSerie">' + esc(setName[sid] || sid) + '</div>';
+    var a = bySet[sid];
+    for(var m=0;m<a.length;m++){
+      var c2 = a[m], vs = stkVars(c2), det = [];
+      for(var v=0;v<vs.length;v++){ var qq = stkVarQ(c2.i, vs[v]); if(qq) det.push(VAR_FULL[vs[v]] + ' ×' + qq); }
+      h += '<div class="stkRow" data-stkid="' + esc(c2.i) + '">' +
+           '<img loading="lazy" src="' + esc(cdbImg(c2)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+           '<div class="rt"><b>' + esc(c2.n) + '</b><small>N° ' + esc(c2.u) + (det.length ? ' · ' + esc(det.join(' · ')) : '') + '</small></div>' +
+           '<div class="rq">' + stkCardQ(c2.i) + '</div></div>';
+    }
+  }
+  $('view').innerHTML = h;
+}
+
+/* ---- panneau détail carte ---- */
+function sheetStkCard(id){
+  var c = cdbById[id];
+  if(!c) return;
+  var vs = stkVars(c), all = ['n','r','h'];
+  var h = '<h3>' + esc(c.n) + '</h3><p class="sub">N° ' + esc(c.u) + ' · ' + esc(c.r || '—') + '</p>';
+  if(c.d) h += '<div class="stkWarn">Variantes déduites de la rareté, non certifiées par TCGdex. Corrige-les si besoin.</div>';
+  for(var i=0;i<vs.length;i++){
+    var v = vs[i];
+    h += '<div class="shV"><div class="vh"><span>' + VAR_FULL[v] + '</span><em>total ' + stkVarQ(id, v) + '</em></div>';
+    for(var e=0;e<ETS.length;e++){
+      var et = ETS[e][0];
+      h += '<div class="shE"><label>' + esc(ETS[e][1]) + '</label>' +
+           '<button data-stkd="' + esc(id) + '|' + v + '|' + et + '|-1">−</button>' +
+           '<span class="qv" id="sq_' + v + '_' + et + '">' + stkQ(id, v, et) + '</span>' +
+           '<button data-stkd="' + esc(id) + '|' + v + '|' + et + '|1">+</button></div>';
+    }
+    h += '</div>';
+  }
+  var miss = all.filter(function(x){ return vs.indexOf(x) < 0; });
+  if(miss.length){
+    h += '<p class="sub" style="margin-top:4px">Variante manquante ?</p><div class="acts">';
+    for(var m=0;m<miss.length;m++) h += '<button class="aBtn" data-stkav="' + esc(id) + '|' + miss[m] + '">+ ' + VAR_FULL[miss[m]] + '</button>';
+    h += '</div>';
+  }
+  openSheet(h);
+}
+
+/* ---- interactions ---- */
+function stkBind(){
+  var vw = $('view');
+
+  vw.addEventListener('click', function(e){
+    if(tab !== 'stock') return;
+    var t;
+    if((t = e.target.closest('[data-stkback]'))){ stkSet = null; window.scrollTo(0,0); render(); return; }
+    if((t = e.target.closest('[data-stkset]'))){ stkSet = t.getAttribute('data-stkset'); window.scrollTo(0,0); render(); return; }
+    if((t = e.target.closest('[data-stkv]'))){
+      if(stkLpFired){ stkLpFired = false; return; }
+      var p = t.getAttribute('data-stkv').split('|');
+      if(stkAdd(p[0], p[1], 'nm', 1)) stkRefresh(p[0]);
+      return;
+    }
+    if((t = e.target.closest('.stkRow[data-stkid]'))){ sheetStkCard(t.getAttribute('data-stkid')); return; }
+    if((t = e.target.closest('.stkC[data-stkid]'))){ sheetStkCard(t.getAttribute('data-stkid')); return; }
+  });
+
+  /* appui long sur un compteur = -1 */
+  vw.addEventListener('touchstart', function(e){
+    if(tab !== 'stock') return;
+    var t = e.target.closest('[data-stkv]');
+    if(!t) return;
+    stkLpFired = false;
+    clearTimeout(stkLp);
+    stkLp = setTimeout(function(){
+      stkLpFired = true;
+      var p = t.getAttribute('data-stkv').split('|');
+      var et = 'nm';
+      for(var i=0;i<ETS.length;i++) if(stkQ(p[0], p[1], ETS[i][0]) > 0){ et = ETS[i][0]; break; }
+      if(stkAdd(p[0], p[1], et, -1)){ if(navigator.vibrate) navigator.vibrate(18); stkRefresh(p[0]); }
+    }, 420);
+  }, { passive:true });
+  ['touchend','touchmove','touchcancel'].forEach(function(ev){
+    vw.addEventListener(ev, function(){ clearTimeout(stkLp); }, { passive:true });
+  });
+
+  document.addEventListener('click', function(e){
+    var t;
+    if((t = e.target.closest('[data-stkd]'))){
+      var p = t.getAttribute('data-stkd').split('|');
+      if(stkAdd(p[0], p[1], p[2], parseInt(p[3],10))){
+        var q = $('sq_' + p[1] + '_' + p[2]);
+        if(q) q.textContent = stkQ(p[0], p[1], p[2]);
+        var hd = t.closest('.shV');
+        if(hd) hd.querySelector('em').textContent = 'total ' + stkVarQ(p[0], p[1]);
+        stkRefresh(p[0]);
+      }
+      return;
+    }
+    if((t = e.target.closest('[data-stkav]'))){
+      var q2 = t.getAttribute('data-stkav').split('|');
+      var c = cdbById[q2[0]];
+      var cur = (stkOv[q2[0]] != null) ? stkOv[q2[0]] : c.v;
+      stkSetOv(q2[0], cur | VAR_BIT[q2[1]]);
+      sheetStkCard(q2[0]);
+      stkRefresh(q2[0]);
+      return;
+    }
+  });
+}
+
+/* met à jour la vignette concernée sans re-rendre toute la grille */
+function stkRefresh(id){
+  var c = cdbById[id];
+  if(!c) return;
+  var el = document.querySelector('.stkC[data-stkid="' + id.replace(/"/g,'') + '"]');
+  if(el){
+    var tmp = document.createElement('div');
+    tmp.innerHTML = stkTile(c);
+    el.replaceWith(tmp.firstChild);
+    return;
+  }
+  var row = document.querySelector('.stkRow[data-stkid="' + id.replace(/"/g,'') + '"]');
+  if(row){ var rq = row.querySelector('.rq'); if(rq) rq.textContent = stkCardQ(id); }
+}
+
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'hidden' && stkPending.length){ clearTimeout(stkTimer); stkSave(); }
+});
+
+stkBind();
 </script>
 </body>
 </html>
