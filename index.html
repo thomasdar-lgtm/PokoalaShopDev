@@ -317,6 +317,8 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkC .vs{display:flex;gap:3px;padding:0 4px 5px}
 .stkV{flex:1;border:1px solid var(--bd);background:#0c1428;border-radius:6px;padding:4px 0;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 .stkV .vl{display:block;font-size:8px;font-weight:800;color:var(--tx3);letter-spacing:.3px}
+.stkV.solo{padding:6px 0}
+.stkV.solo .vq{font-size:16px}
 .stkV .vq{display:block;font-size:13px;font-weight:900;line-height:1.1}
 .stkV.q0 .vq{color:var(--tx3);opacity:.45}
 .stkV.on{border-color:var(--blu);background:rgba(56,139,253,.13)}
@@ -415,7 +417,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.42d';
+var APP_VERSION = '2.43d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2390,10 +2392,12 @@ function stkTile(c){
   h += '<div class="im"><img loading="lazy" src="' + esc(cdbImg(c)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
        '<span class="nu">' + esc(c.u) + '</span>' + (c.d ? '<span class="stkDot" title="variante déduite"></span>' : '') + '</div>';
   h += '<div class="na">' + esc(c.n) + '</div><div class="vs">';
+  var solo = vs.length === 1;
   for(var i=0;i<vs.length;i++){
     var q = stkVarQ(c.i, vs[i]);
-    h += '<div class="stkV ' + (q ? 'on' : 'q0') + '" data-stkv="' + esc(c.i) + '|' + vs[i] + '">' +
-         '<span class="vl">' + VAR_LBL[vs[i]] + '</span><span class="vq">' + q + '</span></div>';
+    h += '<div class="stkV ' + (q ? 'on' : 'q0') + (solo ? ' solo' : '') + '" data-stkv="' + esc(c.i) + '|' + vs[i] + '">' +
+         (solo ? '' : '<span class="vl">' + VAR_LBL[vs[i]] + '</span>') +
+         '<span class="vq">' + q + '</span></div>';
   }
   return h + '</div></div>';
 }
@@ -2470,7 +2474,10 @@ async function stkRenderSearch(q){
     h += '<div class="stkSerie">' + esc(si ? si.name : order[o]) + (sc ? ' · ' + esc(si.code) : '') + '</div>';
     for(var z=0;z<a.length;z++){
       var c2 = a[z], vs = stkVars(c2), det = [];
-      for(var v=0;v<vs.length;v++){ var qq = stkVarQ(c2.i, vs[v]); if(qq) det.push(VAR_FULL[vs[v]] + ' ×' + qq); }
+      for(var v=0;v<vs.length;v++){
+        var qq = stkVarQ(c2.i, vs[v]);
+        if(qq) det.push(vs.length === 1 ? ('×' + qq) : (VAR_FULL[vs[v]] + ' ×' + qq));
+      }
       h += '<div class="stkRow" data-stkid="' + esc(c2.i) + '">' +
            '<img loading="lazy" src="' + esc(cdbImg(c2)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
            '<div class="rt"><b>' + esc(c2.n) + '</b><small>N° ' + esc(c2.u) + (det.length ? ' · ' + esc(det.join(' · ')) : '') + '</small></div>' +
@@ -2487,9 +2494,11 @@ function sheetStkCard(id){
   var vs = stkVars(c), all = ['n','r','h'];
   var h = '<h3>' + esc(c.n) + '</h3><p class="sub">N° ' + esc(c.u) + ' · ' + esc(c.r || '—') + '</p>';
   if(c.d) h += '<div class="stkWarn">Variantes déduites de la rareté, non certifiées par TCGdex. Corrige-les si besoin.</div>';
+  var solo = vs.length === 1;
   for(var i=0;i<vs.length;i++){
     var v = vs[i];
-    h += '<div class="shV"><div class="vh"><span>' + VAR_FULL[v] + '</span><em>total ' + stkVarQ(id, v) + '</em></div>';
+    h += '<div class="shV"><div class="vh"><span>' + (solo ? 'Exemplaires' : VAR_FULL[v]) +
+         '</span><em>total ' + stkVarQ(id, v) + '</em></div>';
     for(var e=0;e<ETS.length;e++){
       var et = ETS[e][0];
       h += '<div class="shE"><label>' + esc(ETS[e][1]) + '</label>' +
