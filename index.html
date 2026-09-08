@@ -334,9 +334,14 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkRow .rt b{display:block;font-size:13px;font-weight:700}
 .stkRow .rt small{color:var(--tx3);font-size:11px;font-weight:600}
 .stkRow .rq{font-size:15px;font-weight:900;color:var(--blu);flex:none}
+.shImg{display:block;width:100%;max-width:196px;margin:2px auto 12px;border-radius:9px;background:#0c1428;aspect-ratio:245/342;object-fit:cover;box-shadow:0 6px 20px rgba(0,0,0,.42);cursor:zoom-in}
+.shImg.gone{display:none}
 .shV{border:1px solid var(--bd);border-radius:10px;padding:10px 11px;margin-bottom:9px}
 .shV .vh{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:8px}
 .shV .vh em{font-style:normal;color:var(--tx3);font-weight:700;font-size:11px}
+.shV .vh .rr{display:flex;align-items:center;gap:8px}
+.vRm{width:24px;height:24px;border-radius:6px;border:1px solid var(--bd);background:#0c1428;color:var(--tx3);font-size:14px;font-weight:800;line-height:1;cursor:pointer;padding:0;flex:none}
+.vRm:active{color:#f85149;border-color:rgba(248,81,73,.5)}
 .shE{display:flex;align-items:center;gap:9px;margin-top:6px}
 .shE label{flex:1;font-size:12px;font-weight:600;color:var(--tx2)}
 .shE button{width:31px;height:31px;border-radius:8px;border:1px solid var(--bd);background:#0c1428;color:var(--tx);font-size:16px;font-weight:800;cursor:pointer;flex:none;line-height:1}
@@ -417,7 +422,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.43d';
+var APP_VERSION = '2.45d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2261,6 +2266,14 @@ function symNext(img){
   img.replaceWith(fb);
 }
 function cdbImg(c){ return c.g ? c.g + '/low.webp' : ''; }
+/* visuel de carte : haute definition, repli sur la basse puis masquage */
+function cdbImgBig(c){ return c.g ? c.g + '/high.webp' : ''; }
+function cardImgErr(img){
+  var lo = img.getAttribute('data-lo');
+  if(lo && img.src !== lo){ img.src = lo; img.removeAttribute('data-lo'); return; }
+  img.classList.add('gone');
+}
+
 
 /* ---- persistance Drive ---- */
 async function stkFind(){
@@ -2493,12 +2506,18 @@ function sheetStkCard(id){
   if(!c) return;
   var vs = stkVars(c), all = ['n','r','h'];
   var h = '<h3>' + esc(c.n) + '</h3><p class="sub">N° ' + esc(c.u) + ' · ' + esc(c.r || '—') + '</p>';
+  if(c.g) h += '<img class="shImg" src="' + esc(cdbImgBig(c)) + '" data-lo="' + esc(cdbImg(c)) + '" ' +
+               'alt="" onerror="cardImgErr(this)" data-stkzoom="' + esc(c.i) + '">';
   if(c.d) h += '<div class="stkWarn">Variantes déduites de la rareté, non certifiées par TCGdex. Corrige-les si besoin.</div>';
   var solo = vs.length === 1;
   for(var i=0;i<vs.length;i++){
     var v = vs[i];
+    var vq = stkVarQ(id, v);
+    var canRm = !solo && vq === 0;
     h += '<div class="shV"><div class="vh"><span>' + (solo ? 'Exemplaires' : VAR_FULL[v]) +
-         '</span><em>total ' + stkVarQ(id, v) + '</em></div>';
+         '</span><span class="rr"><em>total ' + vq + '</em>' +
+         (canRm ? '<button class="vRm" data-stkrv="' + esc(id) + '|' + v + '" title="Retirer cette variante">×</button>' : '') +
+         '</span></div>';
     for(var e=0;e<ETS.length;e++){
       var et = ETS[e][0];
       h += '<div class="shE"><label>' + esc(ETS[e][1]) + '</label>' +
@@ -2507,6 +2526,9 @@ function sheetStkCard(id){
            '<button data-stkd="' + esc(id) + '|' + v + '|' + et + '|1">+</button></div>';
     }
     h += '</div>';
+  }
+  if(stkOv[id] != null){
+    h += '<div class="acts" style="margin-bottom:9px"><button class="aBtn" data-stkreset="' + esc(id) + '">Rétablir les variantes d\'origine</button></div>';
   }
   var miss = all.filter(function(x){ return vs.indexOf(x) < 0; });
   if(miss.length){
@@ -2576,11 +2598,34 @@ function stkBind(){
       }
       return;
     }
+    if((t = e.target.closest('[data-stkzoom]'))){
+      var cz = cdbById[t.getAttribute('data-stkzoom')];
+      if(cz && typeof showLightbox === 'function') showLightbox(cdbImgBig(cz));
+      return;
+    }
+    if((t = e.target.closest('[data-stkrv]'))){
+      var pr = t.getAttribute('data-stkrv').split('|');
+      var cr = cdbById[pr[0]];
+      if(!cr) return;
+      var mr = (stkOv[pr[0]] != null) ? stkOv[pr[0]] : cr.v;
+      var nr = mr & ~VAR_BIT[pr[1]];
+      if(!nr) return;                       /* jamais zero variante */
+      stkSetOv(pr[0], nr === cr.v ? 0 : nr);
+      sheetStkCard(pr[0]); stkRefresh(pr[0]);
+      return;
+    }
+    if((t = e.target.closest('[data-stkreset]'))){
+      var ir = t.getAttribute('data-stkreset');
+      stkSetOv(ir, 0);
+      sheetStkCard(ir); stkRefresh(ir);
+      return;
+    }
     if((t = e.target.closest('[data-stkav]'))){
       var q2 = t.getAttribute('data-stkav').split('|');
       var c = cdbById[q2[0]];
       var cur = (stkOv[q2[0]] != null) ? stkOv[q2[0]] : c.v;
-      stkSetOv(q2[0], cur | VAR_BIT[q2[1]]);
+      var nm2 = cur | VAR_BIT[q2[1]];
+      stkSetOv(q2[0], nm2 === c.v ? 0 : nm2);
       sheetStkCard(q2[0]);
       stkRefresh(q2[0]);
       return;
