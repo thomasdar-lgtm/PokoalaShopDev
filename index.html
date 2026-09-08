@@ -296,11 +296,14 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkTit{font-weight:800;font-size:15px;line-height:1.2;flex:1;min-width:0}
 .stkTit small{display:block;color:var(--tx3);font-weight:600;font-size:11px;margin-top:2px}
 .stkSet{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:7px;cursor:pointer}
-.stkSet b{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ssym{width:26px;height:26px;object-fit:contain;flex:none;filter:brightness(0) invert(1);opacity:.9}
-.scode{font-size:10px;font-weight:900;letter-spacing:.7px;color:var(--tx3);background:#0c1428;border:1px solid var(--bd);border-radius:5px;padding:2px 5px;flex:none}
-.stkTit .th{display:flex;align-items:center;gap:7px}
-.stkTit .th .ssym{width:22px;height:22px}
+.ssym{width:24px;height:24px;object-fit:contain;flex:none}
+.ssym.gone{display:none}
+.sfb{width:24px;height:24px;flex:none;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:var(--tx3);border:1px solid var(--bd);border-radius:5px;letter-spacing:.2px}
+.sinfo{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+.sinfo b{font-size:14px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scode{font-size:9px;font-weight:900;letter-spacing:.6px;color:var(--tx3);background:#0c1428;border:1px solid var(--bd);border-radius:4px;padding:2px 5px;flex:none}
+.stkTit .th{display:flex;align-items:center;gap:7px;min-width:0}
+.stkTit .th .ssym,.stkTit .th .sfb{width:21px;height:21px}
 .stkSet .sc{font-size:12px;font-weight:800;color:var(--blu);flex:none}
 .stkSet .sc.z{color:var(--tx3);font-weight:600}
 .stkSerie{color:var(--tx3);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin:15px 0 7px}
@@ -412,7 +415,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.38d';
+var APP_VERSION = '2.40d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2156,11 +2159,19 @@ window.addEventListener('load', function(){
     }
   };
   document.head.appendChild(s);
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function(reg){
+      reg.update();
+      document.addEventListener('visibilitychange', function(){
+        if(document.visibilityState === 'visible') reg.update();
+      });
+    }).catch(function(){});
+  }
 });
 
 /* ===================== MODULE STOCK ===================== */
 var STK_FILE = 'dvstk.json';
+var CARDS_VER = '4';   /* a incrementer a chaque regeneration de pks_cards.json */
 var VAR_LBL = { n:'Norm', r:'Rev', h:'Holo' };
 var VAR_FULL = { n:'Normale', r:'Reverse', h:'Holo' };
 var VAR_BIT = { n:1, r:2, h:4 };
@@ -2191,7 +2202,7 @@ async function cdbLoad(){
   if(cdb || cdbLoading) return;
   cdbLoading = true;
   try{
-    var r = await fetch('./pks_cards.json', { cache:'force-cache' });
+    var r = await fetch('./pks_cards.json?v=' + CARDS_VER);
     if(!r.ok) throw new Error('http ' + r.status);
     cdb = await r.json();
     cdbBySet = {}; cdbById = {};
@@ -2211,6 +2222,24 @@ async function cdbLoad(){
     }
   }catch(e){ cdb = null; toast('Base de cartes introuvable'); }
   cdbLoading = false;
+}
+
+/* symbole d'extension : essaie les sources dans l'ordre, pokemontcg.io en dernier */
+function symHtml(st, cls){
+  var l = st.syms || [];
+  if(!l.length) return '<span class="sfb ' + (cls||'') + '">' + esc((st.code || '?').slice(0,3)) + '</span>';
+  return '<img class="ssym ' + (cls||'') + '" loading="lazy" src="' + esc(l[0]) + '" alt="" ' +
+         'data-sy="' + esc(JSON.stringify(l)) + '" data-syi="0" data-code="' + esc(st.code || '') + '" onerror="symNext(this)">';
+}
+function symNext(img){
+  var l; try{ l = JSON.parse(img.getAttribute('data-sy')); }catch(e){ l = []; }
+  var i = parseInt(img.getAttribute('data-syi'), 10) + 1;
+  if(i < l.length){ img.setAttribute('data-syi', i); img.src = l[i]; return; }
+  img.classList.add('gone');
+  var fb = document.createElement('span');
+  fb.className = 'sfb';
+  fb.textContent = (img.getAttribute('data-code') || '?').slice(0,3);
+  img.replaceWith(fb);
 }
 function cdbImg(c){ return c.g ? c.g + '/low.webp' : ''; }
 
@@ -2339,10 +2368,9 @@ function stkRenderSets(){
     var arr = bySerie[order[o]];
     for(var j=0;j<arr.length;j++){
       var st = arr[j], n = per[st.id] || 0;
-      h += '<div class="stkSet" data-stkset="' + esc(st.id) + '">' +
-           (st.sym ? '<img class="ssym" loading="lazy" src="' + esc(st.sym) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
-           '<b>' + esc(st.name) + '</b>' +
-           (st.code ? '<span class="scode">' + esc(st.code) + '</span>' : '') +
+      h += '<div class="stkSet" data-stkset="' + esc(st.id) + '">' + symHtml(st) +
+           '<div class="sinfo"><b>' + esc(st.name) + '</b>' +
+           (st.code ? '<span class="scode">' + esc(st.code) + '</span>' : '') + '</div>' +
            '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n : '—') + '</span></div>';
     }
   }
@@ -2372,7 +2400,7 @@ function stkRenderGrid(){
   var ico = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
   var h = '<div class="stkBar"><button class="stkBack" data-stkback="1" aria-label="Retour">' + ico + '</button>' +
           '<div class="stkTit"><span class="th">' +
-          (s && s.sym ? '<img class="ssym" src="' + esc(s.sym) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
+          (s ? symHtml(s) : '') +
           esc(s ? s.name : stkSet) +
           (s && s.code ? '<span class="scode">' + esc(s.code) + '</span>' : '') + '</span>' +
           '<small>' + arr.length + ' cartes · ' + tot + ' en stock</small></div></div>';
