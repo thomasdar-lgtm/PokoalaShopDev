@@ -60,7 +60,7 @@ header{position:sticky;top:0;z-index:60;background:var(--bg);padding:calc(10px +
 .srch input:focus{border-color:var(--red)}
 .srch .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:13px}
 .srch .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--surf2);border:0;color:var(--tx2);width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding-bottom:10px}
 .st{background:var(--surf);border-radius:10px;padding:7px 4px;text-align:center}
 .stV{font-size:17px;font-weight:800;line-height:1.1}
 .stL{font-size:9.5px;color:var(--tx2);margin-top:2px}
@@ -364,10 +364,9 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
       <input type="search" id="q" placeholder="Nom, Pokémon, boîte…" autocomplete="off">
       <button class="clr hide" id="qClr">×</button>
     </div>
-    <div class="stats">
+    <div class="stats" id="stats">
       <div class="st a"><div class="stV" id="s1">0</div><div class="stL">Vitrine</div></div>
       <div class="st b"><div class="stV" id="s2">0</div><div class="stL">À faire</div></div>
-      <div class="st c"><div class="stV" id="s3">0</div><div class="stL">À expédier</div></div>
       <div class="st d"><div class="stV" id="s4">0€</div><div class="stL">Revenus</div></div>
     </div>
   </header>
@@ -379,7 +378,6 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
   <nav>
     <div class="nv on" data-t="vitrine"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/> <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/> <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></svg>Vitrine</div>
     <div class="nv" data-t="afaire"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8"/> <path d="M13 12h8"/> <path d="M13 19h8"/> <path d="m3 17 2 2 4-4"/> <rect x="3" y="4" width="6" height="6" rx="1"/></svg>À faire<span class="nvB hide" id="nb2"></span></div>
-    <div class="nv" data-t="cmd"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/> <path d="m16 17 2 2 4-4"/> <path d="M21 11.127V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l1.32-.753"/> <path d="M3.29 7 12 12l8.71-5"/> <path d="m7.5 4.27 8.997 5.148"/></svg>Commandes<span class="nvB hide" id="nb3"></span></div>
     <div class="nv" data-t="stock"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M2 7h20v4H2z"/><path d="M10 14h4"/></svg>Stock</div>
     <div class="nv" data-t="histo"><svg class="nvI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/> <path d="M3 3v5h5"/> <path d="M12 7v5l4 2"/></svg>Historique</div>
   </nav>
@@ -408,7 +406,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.36d';
+var APP_VERSION = '2.37d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -958,23 +956,20 @@ function exportCsv(){
 function render(){
   var vitrine = byStatus('vitrine').length;
   var afaire = byStatus('afaire').length + byStatus('pret').length;
-  var vendus = byStatus('vendu').length;
   var rev = 0;
   for(var i=0;i<lots.length;i++){
     if(lots[i].st === 'vendu' || lots[i].st === 'expedie') rev += (num(lots[i].pv) || 0);
   }
   $('s1').textContent = vitrine;
   $('s2').textContent = afaire;
-  $('s3').textContent = vendus;
   $('s4').textContent = eur0(rev);
   setBadge('nb2', afaire);
-  setBadge('nb3', vendus);
+  $('stats').classList.toggle('hide', tab !== 'vitrine' && tab !== 'histo');
   $('qClr').classList.toggle('hide', !query());
 
   if(selMode) updateSelBar();
   if(tab === 'vitrine') renderVitrine();
   else if(tab === 'afaire') renderAfaire();
-  else if(tab === 'cmd') renderCmd();
   else if(tab === 'stock'){ renderStock(); return; }
   else renderHisto();
   hydratePhotos();
@@ -1120,9 +1115,7 @@ function card(l){
   } else if(l.st === 'vitrine'){
     acts.push('<button class="aBtn g" data-sell="' + l.id + '" draggable="false" style="-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none">Marquer vendu</button>');
     acts.push('<button class="aBtn" data-tag="' + l.id + '">Hashtags</button>');
-  } else if(l.st === 'vendu'){
-    acts.push('<button class="aBtn o" data-mv="' + l.id + '|expedie">Marquer expédié</button>');
-  } else if(l.st === 'expedie'){
+  } else if(l.st === 'vendu' || l.st === 'expedie'){
     acts.push('<button class="aBtn p" data-again="' + l.id + '">Refaire ce lot</button>');
   }
   acts.push('<button class="aBtn" data-open="' + l.id + '" aria-label="Modifier"><span style="width:13px;height:13px;display:inline-block;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;display:block"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/> <path d="m15 5 4 4"/></svg></span></button>');
