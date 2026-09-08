@@ -437,7 +437,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.46d';
+var APP_VERSION = '2.47d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -878,10 +878,18 @@ function matches(l, q){
          norm(l.notes).indexOf(n) >= 0 ||
          norm(l.acheteur).indexOf(n) >= 0;
 }
+/* nombre de cartes : valeur saisie pour les anciens lots,
+   compte reel des cartes rattachees pour les nouveaux */
+function lotNb(l){
+  if(l && l.nb != null) return l.nb;
+  var n = (typeof lotCardCount === 'function') ? lotCardCount(l) : 0;
+  return n || null;
+}
 function lotTitle(l){
   if(l.nom) return l.nom;
   var p = l.poke || 'Lot';
-  return l.nb ? (p + ' — ' + l.nb + ' cartes') : p;
+  var n = lotNb(l);
+  return n ? (p + ' — ' + n + ' cartes') : p;
 }
 
 /* ═══ SAUVEGARDES ═══ */
@@ -975,7 +983,7 @@ function exportCsv(){
     var jours = (l.dtListe && l.dtVente)
       ? Math.max(0, Math.round((new Date(l.dtVente) - new Date(l.dtListe)) / 86400000)) : '';
     tot += (num(l.pv) || 0);
-    rows.push([dt(l.dtVente), l.poke, lotTitle(l), l.nb, l.pa, l.pm, l.pv, l.acheteur, l.boite, dt(l.dtListe), jours].map(csvCell).join(';'));
+    rows.push([dt(l.dtVente), l.poke, lotTitle(l), lotNb(l), l.pa, l.pm, l.pv, l.acheteur, l.boite, dt(l.dtListe), jours].map(csvCell).join(';'));
   }
   rows.push('');
   rows.push([csvCell('Total'),'','','','','',csvCell(tot.toFixed(2))].join(';'));
@@ -1130,7 +1138,8 @@ function card(l){
     : '<div class="cPh" data-open="' + l.id + '"><span class="ph-holder" style="width:26px;height:26px;display:block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;display:block"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/> <path d="M12 22V12"/> <polyline points="3.29 7 12 12 20.71 7"/> <path d="m7.5 4.27 9 5.15"/></svg></span></div>';
 
   var chips = [];
-  if(l.nb) chips.push('<span class="chip cB">' + l.nb + ' cartes</span>');
+  var _nb = lotNb(l);
+  if(_nb) chips.push('<span class="chip cB">' + _nb + ' cartes</span>');
   if(l.boite) chips.push('<span class="chip cO">Boîte ' + esc(l.boite) + (l.sep ? ' · ' + esc(l.sep) : '') + '</span>');
   if(num(l.pa) != null) chips.push('<span class="chip cA">' + eur(num(l.pa)) + '</span>');
   if(num(l.pm) != null) chips.push('<span class="chip cY">min ' + eur(num(l.pm)) + '</span>');
@@ -1276,7 +1285,8 @@ function renderHisto(){
   for(var k=0;k<groups.length;k++){
     var o = groups[k];
     var rows = o.items.slice(0,3).map(function(l){
-      var quoi = groupBy === 'ach' ? esc(l.poke || '?') : (l.nb ? l.nb + ' cartes' : '');
+      var _n2 = lotNb(l);
+      var quoi = groupBy === 'ach' ? esc(l.poke || '?') : (_n2 ? _n2 + ' cartes' : '');
       return '<div class="hRow"><span>' + dt(l.dtVente) + (quoi ? ' · ' + quoi : '') + '</span><b>' + eur(num(l.pv)) + '</b></div>';
     }).join('');
     var more = o.items.length > 3 ? '<div class="hRow" style="color:var(--red)"><span>Voir les ' + o.items.length + ' ventes</span><span>›</span></div>' : '';
@@ -1415,7 +1425,8 @@ function sheetBoxes(){
 
 function histoRow(l, byPoke){
   var meta = [];
-  if(l.nb) meta.push(l.nb + ' cartes');
+  var _n3 = lotNb(l);
+  if(_n3) meta.push(_n3 + ' cartes');
   if(byPoke){ if(l.acheteur) meta.push(esc(l.acheteur)); }
   else meta.push(esc(l.poke || '?'));
   if(num(l.pa) != null) meta.push('affiché ' + eur(num(l.pa)));
@@ -1479,7 +1490,7 @@ function sheetView(id){
     : '';
   var rows =
     row('Pokémon', esc(l.poke)) +
-    row('Nombre de cartes', l.nb) +
+    row('Nombre de cartes', lotNb(l)) +
     row('Statut', ST[l.st]) +
     row('Prix affiché', num(l.pa) != null ? eur(num(l.pa)) : '') +
     row('Prix mini accepté', num(l.pm) != null ? eur(num(l.pm)) : '') +
@@ -1527,10 +1538,8 @@ function sheetNew(defMode){
   var lbl  = { vitrine:'Mettre en vitrine', afaire:'Ajouter à préparer' };
   openSheet(
     '<div class="shT">Nouveau lot</div>' +
-    '<div class="shS">Seul le Pokémon est obligatoire. Tout le reste peut être complété plus tard.</div>' +
+    '<div class="shS">Seul le Pokémon est obligatoire. Le sélecteur de cartes s\'ouvrira juste après.</div>' +
     '<div class="fld"><label class="lbl">Pokémon</label><input class="inp" id="f_poke" placeholder="Évoli"' + noAuto() + '></div>' +
-    '<div class="row2"><div class="fld"><label class="lbl">Nombre de cartes</label><input class="inp" id="f_nb" type="number" inputmode="numeric" placeholder="25"' + noAuto() + '></div>' +
-    '<div class="fld"><label class="lbl">Boîte</label><input class="inp" id="f_boite" placeholder="3"' + noAuto() + '></div></div>' +
     '<div class="fld"><label class="lbl">Séparateur (optionnel)</label><input class="inp" id="f_sep" placeholder="Évoli B"' + noAuto() + '></div>' +
     '<div class="row2"><div class="fld"><label class="lbl">Prix affiché</label><input class="inp" id="f_pa" type="number" inputmode="decimal" step="0.5" placeholder="12"' + noAuto() + '></div>' +
     '<div class="fld"><label class="lbl">Prix mini accepté</label><input class="inp" id="f_pm" type="number" inputmode="decimal" step="0.5" placeholder="9"' + noAuto() + '></div></div>' +
@@ -1541,7 +1550,7 @@ function sheetNew(defMode){
     '<div class="shF"><button class="bS" id="x1">Annuler</button><button class="bP" id="k1">' + lbl[main] + '</button></div>' +
     '<button class="dgr" id="k1b" style="border-color:var(--bd);color:var(--tx2)">' + lbl[alt] + '</button>'
   );
-  clearInputs(['f_poke','f_nb','f_boite','f_sep','f_pa','f_pm','f_nom','f_dl']);
+  clearInputs(['f_poke','f_sep','f_pa','f_pm','f_nom','f_dl']);
   bindPhoto();
   $('x1').onclick = closeSheet;
   $('k1').onclick = function(){ createLot(main, 'k1'); };
@@ -1611,8 +1620,8 @@ async function createLot(mode, btnId){
   var l = {
     id: nid(), poke: poke,
     nom: $('f_nom').value.trim(),
-    nb: parseInt($('f_nb').value,10) || null,
-    boite: $('f_boite').value.trim(), sep: $('f_sep').value.trim(),
+    nb: null, cards: {},
+    boite: '', sep: $('f_sep').value.trim(),
     st: mode, pa: num($('f_pa').value), pm: num($('f_pm').value), pv: null,
     acheteur: '', notes: '', photo: photoId,
     dtCree: now(), dtPret: null, dtListe: null, dtVente: null, dtExp: null
@@ -1623,6 +1632,7 @@ async function createLot(mode, btnId){
   closeSheet();
   commit(l);
   toast(mode === 'vitrine' ? 'Lot en vitrine' : 'Lot à préparer');
+  setTimeout(function(){ sheetPick(l.id); }, 280);   /* enchainer sur le choix des cartes */
 }
 
 /* étape 2 : mise en ligne — prix + photo */
