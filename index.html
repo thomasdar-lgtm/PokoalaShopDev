@@ -331,10 +331,10 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkV.on{border-color:var(--blu);background:rgba(56,139,253,.13)}
 .stkV.on .vq{color:var(--blu)}
 .stkDot{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:#d29922;opacity:.85}
-.stkTot{background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:12px;display:flex;gap:12px}
+.stkTot{background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 11px;margin-bottom:12px;display:flex;gap:9px}
 .stkTot div{flex:1;min-width:0}
 .stkTot span{display:block;font-size:9px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stkTot b{font-size:19px;font-weight:900}
+.stkTot b{font-size:19px;font-weight:900;line-height:1.15}
 .stkRow{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:9px 11px;margin-bottom:7px;cursor:pointer}
 .stkRow img{width:36px;height:50px;object-fit:cover;border-radius:5px;background:#0c1428;flex:none}
 .stkRow .rt{flex:1;min-width:0}
@@ -450,7 +450,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.52d';
+var APP_VERSION = '2.53d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2531,27 +2531,30 @@ async function stkRenderSearch(q){
   var cards = [];
   for(var j=0;j<ids.length;j++){ var c = cdbById[ids[j]]; if(c) cards.push(c); }
   var withQ = cards.filter(function(c){ return stkCardQ(c.i) > 0; });
-  var show = withQ.length ? withQ : cards.slice(0, 150);
+  var LIM = 400, coupe = cards.length > LIM;
+  var show = cards.slice(0, LIM);          /* toujours tout, possede ou non */
   if(!show.length){ $('view').innerHTML = noHit(EMPTY_CMD, 'ce Pokémon'); return; }
 
   var order = [], grp = {};
   for(var m=0;m<cdb.sets.length;m++) order.push(cdb.sets[m].id);
   for(var p=0;p<show.length;p++) (grp[show[p].s] = grp[show[p].s] || []).push(show[p]);
   var tot = 0;
-  for(var t=0;t<show.length;t++) tot += stkCardQ(show[t].i);
+  for(var t=0;t<withQ.length;t++) tot += stkCardQ(withQ[t].i);
 
   var h;
   if(withQ.length){
     h = '<div class="stkTot">' +
-        '<div><span>Exemplaires</span><b>' + tot + '</b></div>' +
-        '<div><span>Différentes</span><b>' + withQ.length + '</b></div>' +
+        '<div><span>Trouvées</span><b>' + show.length + '</b></div>' +
+        '<div><span>J\'en ai</span><b>' + withQ.length + '</b></div>' +
+        '<div><span>Exempl.</span><b>' + tot + '</b></div>' +
         '<div><span>Extensions</span><b>' + Object.keys(grp).length + '</b></div></div>';
   } else {
     h = '<div class="stkTot">' +
         '<div><span>Cartes trouvées</span><b>' + show.length + '</b></div>' +
         '<div><span>Extensions</span><b>' + Object.keys(grp).length + '</b></div></div>';
+    h += '<div class="stkWarn">Aucun exemplaire en stock pour ce nom.</div>';
   }
-  if(!withQ.length) h += '<div class="stkWarn">Aucun exemplaire en stock. Voici les cartes existantes.</div>';
+  if(coupe) h += '<div class="stkWarn">' + cards.length + ' cartes correspondent, seules les ' + LIM + ' premières sont affichées. Affine la recherche.</div>';
   for(var o=0;o<order.length;o++){
     var a = grp[order[o]];
     if(!a) continue;
