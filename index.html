@@ -415,7 +415,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.41d';
+var APP_VERSION = '2.42d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2234,6 +2234,14 @@ function setInfo(sid){
   for(var i=0;i<cdb.sets.length;i++) if(cdb.sets[i].id === sid) return cdb.sets[i];
   return null;
 }
+/* depuis Ecarlate et Violet, le symbole de l'extension porte deja son abreviation :
+   inutile de la repeter a cote du nom */
+var SYM_HAS_CODE = { 'Écarlate et Violet':1, 'Méga-Évolution':1 };
+function codeHtml(st){
+  if(!st || !st.code) return '';
+  if(SYM_HAS_CODE[st.serie] || (st.date && st.date >= '2023-03-31')) return '';
+  return '<span class="scode">' + esc(st.code) + '</span>';
+}
 /* symbole d'extension : essaie les sources dans l'ordre, pokemontcg.io en dernier */
 function symHtml(st, cls){
   var l = st.syms || [];
@@ -2370,8 +2378,7 @@ function stkRenderSets(){
     var st = cdb.sets[i], n = per[st.id] || 0;
     if(st.serie !== cur){ cur = st.serie; h += '<div class="stkSerie">' + esc(cur) + '</div>'; }
     h += '<div class="stkSet" data-stkset="' + esc(st.id) + '">' + symHtml(st) +
-         '<div class="sinfo"><b>' + esc(st.name) + '</b>' +
-         (st.code ? '<span class="scode">' + esc(st.code) + '</span>' : '') + '</div>' +
+         '<div class="sinfo"><b>' + esc(st.name) + '</b>' + codeHtml(st) + '</div>' +
          '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n : '—') + '</span></div>';
   }
   $('view').innerHTML = h;
@@ -2397,7 +2404,7 @@ async function stkRenderGrid(){
   function head(sub){
     return '<div class="stkBar"><button class="stkBack" data-stkback="1" aria-label="Retour">' + ico + '</button>' +
            '<div class="stkTit"><span class="th">' + (s ? symHtml(s) : '') + esc(s ? s.name : sid) +
-           (s && s.code ? '<span class="scode">' + esc(s.code) + '</span>' : '') + '</span>' +
+           codeHtml(s) + '</span>' +
            '<small>' + sub + '</small></div></div>';
   }
   var arr = setCards[sid];
@@ -2459,7 +2466,8 @@ async function stkRenderSearch(q){
     var a = grp[order[o]];
     if(!a) continue;
     var si = setInfo(order[o]);
-    h += '<div class="stkSerie">' + esc(si ? si.name : order[o]) + (si && si.code ? ' · ' + esc(si.code) : '') + '</div>';
+    var sc = si && si.code && !(SYM_HAS_CODE[si.serie] || (si.date && si.date >= '2023-03-31'));
+    h += '<div class="stkSerie">' + esc(si ? si.name : order[o]) + (sc ? ' · ' + esc(si.code) : '') + '</div>';
     for(var z=0;z<a.length;z++){
       var c2 = a[z], vs = stkVars(c2), det = [];
       for(var v=0;v<vs.length;v++){ var qq = stkVarQ(c2.i, vs[v]); if(qq) det.push(VAR_FULL[vs[v]] + ' ×' + qq); }
