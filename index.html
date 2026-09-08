@@ -415,7 +415,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.40d';
+var APP_VERSION = '2.41d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2171,14 +2171,14 @@ window.addEventListener('load', function(){
 
 /* ===================== MODULE STOCK ===================== */
 var STK_FILE = 'dvstk.json';
-var CARDS_VER = '4';   /* a incrementer a chaque regeneration de pks_cards.json */
+var CARDS_VER = '5';   /* a incrementer a chaque regeneration des fichiers de cartes */
 var VAR_LBL = { n:'Norm', r:'Rev', h:'Holo' };
 var VAR_FULL = { n:'Normale', r:'Reverse', h:'Holo' };
 var VAR_BIT = { n:1, r:2, h:4 };
 var ETS = [['nm','Near Mint'],['jo','Joué'],['ab','Abîmé']];
 var ET_LBL = { nm:'NM', jo:'Joué', ab:'Abîmé' };
 
-var cdb = null, cdbBySet = null, cdbById = null, cdbLoading = false;
+var cdb = null, cdbById = {};
 var stock = {}, stkOv = {}, stkMoves = [], stkRev = 0;
 var stkFileId = null, stkBaseRev = 0, stkPending = [];
 var stkTimer = null, stkSaving = false, stkLoaded = false;
@@ -2197,33 +2197,43 @@ function stkVars(c){
   return r.length ? r : ['n'];
 }
 
-/* ---- base de cartes ---- */
-async function cdbLoad(){
-  if(cdb || cdbLoading) return;
-  cdbLoading = true;
-  try{
-    var r = await fetch('./pks_cards.json?v=' + CARDS_VER);
-    if(!r.ok) throw new Error('http ' + r.status);
-    cdb = await r.json();
-    cdbBySet = {}; cdbById = {};
-    for(var i=0;i<cdb.cards.length;i++){
-      var c = cdb.cards[i];
-      cdbById[c.i] = c;
-      (cdbBySet[c.s] = cdbBySet[c.s] || []).push(c);
-    }
-    for(var s in cdbBySet){
-      cdbBySet[s].sort(function(a,b){
-        var x = parseInt(a.u,10), y = parseInt(b.u,10);
-        if(isNaN(x) && isNaN(y)) return String(a.u).localeCompare(String(b.u));
-        if(isNaN(x)) return 1;
-        if(isNaN(y)) return -1;
-        return x - y || String(a.u).localeCompare(String(b.u));
-      });
-    }
-  }catch(e){ cdb = null; toast('Base de cartes introuvable'); }
-  cdbLoading = false;
-}
+/* ---- base de cartes : liste des extensions d'abord, cartes a la demande ---- */
+var setCards = {}, nameIdx = null, cdbP = null, nameP = null, setP = {};
 
+function jget(u){ return fetch(u + '?v=' + CARDS_VER).then(function(r){
+  if(!r.ok) throw new Error('http ' + r.status); return r.json(); }); }
+
+function cdbLoad(){
+  if(cdbP) return cdbP;
+  cdbP = jget('./pks_sets.json').then(function(j){
+    cdb = j; cdbById = {};
+    return j;
+  }).catch(function(e){ cdbP = null; toast('Liste des extensions introuvable'); throw e; });
+  return cdbP;
+}
+function setLoad(sid){
+  if(setCards[sid]) return Promise.resolve(setCards[sid]);
+  if(setP[sid]) return setP[sid];
+  setP[sid] = jget('./cards/' + sid + '.json').then(function(arr){
+    setCards[sid] = arr;
+    for(var i=0;i<arr.length;i++) cdbById[arr[i].i] = arr[i];
+    delete setP[sid];
+    return arr;
+  }).catch(function(e){ delete setP[sid]; toast('Extension indisponible'); throw e; });
+  return setP[sid];
+}
+function namesLoad(){
+  if(nameIdx) return Promise.resolve(nameIdx);
+  if(nameP) return nameP;
+  nameP = jget('./pks_names.json').then(function(j){ nameIdx = j; return j; })
+    .catch(function(e){ nameP = null; toast('Index de recherche indisponible'); throw e; });
+  return nameP;
+}
+function setInfo(sid){
+  if(!cdb) return null;
+  for(var i=0;i<cdb.sets.length;i++) if(cdb.sets[i].id === sid) return cdb.sets[i];
+  return null;
+}
 /* symbole d'extension : essaie les sources dans l'ordre, pokemontcg.io en dernier */
 function symHtml(st, cls){
   var l = st.syms || [];
@@ -2235,7 +2245,6 @@ function symNext(img){
   var l; try{ l = JSON.parse(img.getAttribute('data-sy')); }catch(e){ l = []; }
   var i = parseInt(img.getAttribute('data-syi'), 10) + 1;
   if(i < l.length){ img.setAttribute('data-syi', i); img.src = l[i]; return; }
-  img.classList.add('gone');
   var fb = document.createElement('span');
   fb.className = 'sfb';
   fb.textContent = (img.getAttribute('data-code') || '?').slice(0,3);
@@ -2335,11 +2344,10 @@ function stkSetOv(id, mask){
 /* ---- rendu ---- */
 async function renderStock(){
   if(!cdb){
-    $('view').innerHTML = '<div class="ph">Chargement de la base de cartes…</div>';
-    await cdbLoad();
-    if(!cdb){ $('view').innerHTML = empty(EMPTY_CMD, 'Base de cartes indisponible.'); return; }
+    $('view').innerHTML = '<div class="ph">Chargement des extensions…</div>';
+    try{ await cdbLoad(); }catch(e){ $('view').innerHTML = empty(EMPTY_CMD, 'Liste des extensions indisponible.'); return; }
   }
-  if(!stkLoaded){ await stkLoad(); }
+  if(!stkLoaded) await stkLoad();
   var q = query();
   if(q) return stkRenderSearch(q);
   if(stkSet) return stkRenderGrid();
@@ -2351,28 +2359,20 @@ function stkRenderSets(){
   for(var k in stock){ tot += stock[k]; uniq++; }
   var per = {};
   for(var k2 in stock){
-    var id = k2.split('|')[0], c = cdbById[id];
-    if(c) per[c.s] = (per[c.s] || 0) + stock[k2];
+    var p = k2.split('|')[0], dash = p.lastIndexOf('-');
+    var sid = dash > 0 ? p.slice(0, dash) : p;
+    per[sid] = (per[sid] || 0) + stock[k2];
   }
   var h = '<div class="stkTot"><div><span>Cartes en stock</span><b>' + tot + '</b></div>' +
           '<div><span>Lignes</span><b>' + uniq + '</b></div></div>';
-  var bySerie = {};
+  var seen = {}, cur = null;
   for(var i=0;i<cdb.sets.length;i++){
-    var s = cdb.sets[i];
-    if(!cdbBySet[s.id]) continue;
-    (bySerie[s.serie || 'Extensions'] = bySerie[s.serie || 'Extensions'] || []).push(s);
-  }
-  var order = Object.keys(bySerie);
-  for(var o=0;o<order.length;o++){
-    h += '<div class="stkSerie">' + esc(order[o]) + '</div>';
-    var arr = bySerie[order[o]];
-    for(var j=0;j<arr.length;j++){
-      var st = arr[j], n = per[st.id] || 0;
-      h += '<div class="stkSet" data-stkset="' + esc(st.id) + '">' + symHtml(st) +
-           '<div class="sinfo"><b>' + esc(st.name) + '</b>' +
-           (st.code ? '<span class="scode">' + esc(st.code) + '</span>' : '') + '</div>' +
-           '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n : '—') + '</span></div>';
-    }
+    var st = cdb.sets[i], n = per[st.id] || 0;
+    if(st.serie !== cur){ cur = st.serie; h += '<div class="stkSerie">' + esc(cur) + '</div>'; }
+    h += '<div class="stkSet" data-stkset="' + esc(st.id) + '">' + symHtml(st) +
+         '<div class="sinfo"><b>' + esc(st.name) + '</b>' +
+         (st.code ? '<span class="scode">' + esc(st.code) + '</span>' : '') + '</div>' +
+         '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n : '—') + '</span></div>';
   }
   $('view').innerHTML = h;
 }
@@ -2391,45 +2391,77 @@ function stkTile(c){
   return h + '</div></div>';
 }
 
-function stkRenderGrid(){
-  var s = null;
-  for(var i=0;i<cdb.sets.length;i++) if(cdb.sets[i].id === stkSet) s = cdb.sets[i];
-  var arr = cdbBySet[stkSet] || [];
+async function stkRenderGrid(){
+  var s = setInfo(stkSet), sid = stkSet;
+  var ico = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
+  function head(sub){
+    return '<div class="stkBar"><button class="stkBack" data-stkback="1" aria-label="Retour">' + ico + '</button>' +
+           '<div class="stkTit"><span class="th">' + (s ? symHtml(s) : '') + esc(s ? s.name : sid) +
+           (s && s.code ? '<span class="scode">' + esc(s.code) + '</span>' : '') + '</span>' +
+           '<small>' + sub + '</small></div></div>';
+  }
+  var arr = setCards[sid];
+  if(!arr){
+    $('view').innerHTML = head('chargement…') + '<div class="ph">Chargement des cartes…</div>';
+    try{ arr = await setLoad(sid); }
+    catch(e){ $('view').innerHTML = head('erreur') + empty(EMPTY_CMD, 'Cartes indisponibles.'); return; }
+    if(stkSet !== sid || tab !== 'stock' || query()) return;   /* l'utilisateur est parti entre-temps */
+  }
   var tot = 0;
   for(var j=0;j<arr.length;j++) tot += stkCardQ(arr[j].i);
-  var ico = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
-  var h = '<div class="stkBar"><button class="stkBack" data-stkback="1" aria-label="Retour">' + ico + '</button>' +
-          '<div class="stkTit"><span class="th">' +
-          (s ? symHtml(s) : '') +
-          esc(s ? s.name : stkSet) +
-          (s && s.code ? '<span class="scode">' + esc(s.code) + '</span>' : '') + '</span>' +
-          '<small>' + arr.length + ' cartes · ' + tot + ' en stock</small></div></div>';
-  h += '<div class="stkGrid">';
+  var h = head(arr.length + ' cartes · ' + tot + ' en stock') + '<div class="stkGrid">';
   for(var k=0;k<arr.length;k++) h += stkTile(arr[k]);
   $('view').innerHTML = h + '</div>';
 }
 
-function stkRenderSearch(q){
-  var n = norm(q), res = [];
-  for(var i=0;i<cdb.cards.length && res.length < 400;i++){
-    var c = cdb.cards[i];
-    if(norm(c.n).indexOf(n) >= 0 || norm(c.e).indexOf(n) >= 0) res.push(c);
+async function stkRenderSearch(q){
+  var n = norm(q);
+  if(n.length < 2){ $('view').innerHTML = '<div class="ph">Tape au moins deux lettres.</div>'; return; }
+  if(!nameIdx){
+    $('view').innerHTML = '<div class="ph">Chargement de l\'index…</div>';
+    try{ await namesLoad(); }catch(e){ $('view').innerHTML = empty(EMPTY_CMD, 'Recherche indisponible.'); return; }
+    if(norm(query()) !== n || tab !== 'stock') return;
   }
-  var withQ = res.filter(function(c){ return stkCardQ(c.i) > 0; });
-  var show = withQ.length ? withQ : res.slice(0, 120);
+  var ids = [];
+  for(var nm in nameIdx){ if(nm.indexOf(n) >= 0){ ids = ids.concat(nameIdx[nm]); if(ids.length > 900) break; } }
+  if(!ids.length){ $('view').innerHTML = noHit(EMPTY_CMD, 'ce Pokémon'); return; }
+
+  /* ne charger que les extensions reellement concernees */
+  var need = {}, sids = [];
+  for(var i=0;i<ids.length;i++){
+    var d2 = ids[i].lastIndexOf('-'), sid = d2 > 0 ? ids[i].slice(0, d2) : ids[i];
+    if(!need[sid]){ need[sid] = 1; sids.push(sid); }
+  }
+  var missing = sids.filter(function(s){ return !setCards[s]; });
+  if(missing.length){
+    $('view').innerHTML = '<div class="ph">Recherche dans ' + sids.length + ' extensions…</div>';
+    try{ await Promise.all(missing.map(setLoad)); }catch(e){}
+    if(norm(query()) !== n || tab !== 'stock') return;
+  }
+
+  var cards = [];
+  for(var j=0;j<ids.length;j++){ var c = cdbById[ids[j]]; if(c) cards.push(c); }
+  var withQ = cards.filter(function(c){ return stkCardQ(c.i) > 0; });
+  var show = withQ.length ? withQ : cards.slice(0, 150);
   if(!show.length){ $('view').innerHTML = noHit(EMPTY_CMD, 'ce Pokémon'); return; }
-  var bySet = {}, tot = 0;
-  for(var j=0;j<show.length;j++){ (bySet[show[j].s] = bySet[show[j].s] || []).push(show[j]); tot += stkCardQ(show[j].i); }
-  var setName = {};
-  for(var s=0;s<cdb.sets.length;s++) setName[cdb.sets[s].id] = cdb.sets[s].name;
+
+  var order = [], grp = {};
+  for(var m=0;m<cdb.sets.length;m++) order.push(cdb.sets[m].id);
+  for(var p=0;p<show.length;p++) (grp[show[p].s] = grp[show[p].s] || []).push(show[p]);
+  var tot = 0;
+  for(var t=0;t<show.length;t++) tot += stkCardQ(show[t].i);
+
   var h = '<div class="stkTot"><div><span>' + (withQ.length ? 'En stock' : 'Cartes trouvées') + '</span><b>' +
-          (withQ.length ? tot : show.length) + '</b></div><div><span>Extensions</span><b>' + Object.keys(bySet).length + '</b></div></div>';
-  if(!withQ.length) h += '<div class="stkWarn">Aucun exemplaire en stock pour ce nom. Voici les cartes existantes.</div>';
-  for(var sid in bySet){
-    h += '<div class="stkSerie">' + esc(setName[sid] || sid) + '</div>';
-    var a = bySet[sid];
-    for(var m=0;m<a.length;m++){
-      var c2 = a[m], vs = stkVars(c2), det = [];
+          (withQ.length ? tot : show.length) + '</b></div><div><span>Extensions</span><b>' +
+          Object.keys(grp).length + '</b></div></div>';
+  if(!withQ.length) h += '<div class="stkWarn">Aucun exemplaire en stock. Voici les cartes existantes.</div>';
+  for(var o=0;o<order.length;o++){
+    var a = grp[order[o]];
+    if(!a) continue;
+    var si = setInfo(order[o]);
+    h += '<div class="stkSerie">' + esc(si ? si.name : order[o]) + (si && si.code ? ' · ' + esc(si.code) : '') + '</div>';
+    for(var z=0;z<a.length;z++){
+      var c2 = a[z], vs = stkVars(c2), det = [];
       for(var v=0;v<vs.length;v++){ var qq = stkVarQ(c2.i, vs[v]); if(qq) det.push(VAR_FULL[vs[v]] + ' ×' + qq); }
       h += '<div class="stkRow" data-stkid="' + esc(c2.i) + '">' +
            '<img loading="lazy" src="' + esc(cdbImg(c2)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +

@@ -1,4 +1,4 @@
-const CACHE_VERSION = '2.40d';
+const CACHE_VERSION = '2.41d';
 const CACHE_NAME = 'pokoalashopdev-v' + CACHE_VERSION;
 /* cache non versionne : la base de cartes est versionnee par son URL (?v=N),
    inutile de re-telecharger 2,7 Mo a chaque montee de version */
@@ -25,8 +25,8 @@ self.addEventListener('fetch', e => {
   if (url.hostname.indexOf('googleapis.com') >= 0 || url.hostname.indexOf('accounts.google.com') >= 0 || url.hostname.indexOf('gstatic.com') >= 0) return;
   if (url.origin !== self.location.origin) return;
 
-  /* base de cartes : cache d'abord, la cle inclut le ?v=N */
-  if (url.pathname.endsWith('/pks_cards.json')) {
+  /* donnees de cartes : cache d'abord, la cle inclut le ?v=N */
+  if (/\/(pks_sets|pks_names)\.json$/.test(url.pathname) || url.pathname.indexOf('/cards/') >= 0) {
     e.respondWith(
       caches.open(CACHE_DATA).then(c =>
         c.match(e.request).then(hit => hit || fetch(e.request).then(r => {
