@@ -194,6 +194,10 @@ main{padding:4px 16px 20px}
 @keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
 .grab{width:36px;height:4px;background:var(--surf3);border-radius:3px;margin:11px auto 4px}
 .shT{font-size:16px;font-weight:800;padding:6px 18px 4px}
+.shHd{position:relative;display:flex;align-items:center;justify-content:center;padding:2px 0 10px}
+.shHd .shT{padding:0;text-align:center}
+.shHd .shC{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:9px;border:1px solid var(--bd);background:var(--surf);color:var(--tx2);font-size:17px;font-weight:700;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.shHd .shC:active{color:var(--tx)}
 .shS{font-size:12px;color:var(--tx2);padding:0 18px 12px}
 .fld{padding:0 18px;margin-bottom:13px}
 .lbl{font-size:11.5px;color:var(--tx2);font-weight:600;margin-bottom:5px;display:block}
@@ -437,7 +441,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.47d';
+var APP_VERSION = '2.48d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -1537,22 +1541,20 @@ function sheetNew(defMode){
   var alt  = main === 'vitrine' ? 'afaire' : 'vitrine';
   var lbl  = { vitrine:'Mettre en vitrine', afaire:'Ajouter à préparer' };
   openSheet(
-    '<div class="shT">Nouveau lot</div>' +
-    '<div class="shS">Seul le Pokémon est obligatoire. Le sélecteur de cartes s\'ouvrira juste après.</div>' +
+    '<div class="shHd"><div class="shT">Nouveau lot</div><button class="shC" id="x1t" aria-label="Annuler">×</button></div>' +
     '<div class="fld"><label class="lbl">Pokémon</label><input class="inp" id="f_poke" placeholder="Évoli"' + noAuto() + '></div>' +
-    '<div class="fld"><label class="lbl">Séparateur (optionnel)</label><input class="inp" id="f_sep" placeholder="Évoli B"' + noAuto() + '></div>' +
     '<div class="row2"><div class="fld"><label class="lbl">Prix affiché</label><input class="inp" id="f_pa" type="number" inputmode="decimal" step="0.5" placeholder="12"' + noAuto() + '></div>' +
     '<div class="fld"><label class="lbl">Prix mini accepté</label><input class="inp" id="f_pm" type="number" inputmode="decimal" step="0.5" placeholder="9"' + noAuto() + '></div></div>' +
-    '<div class="fld"><label class="lbl">Titre de l\'annonce (optionnel)</label><input class="inp" id="f_nom" placeholder="laisser vide = Pokémon + nb cartes"' + noAuto() + '></div>' +
     '<div class="fld"><label class="lbl">En ligne sur Vinted depuis le (si déjà publié)</label><input class="inp" id="f_dl" type="date" max="' + toDateInput(now()) + '"></div>' +
     '<div class="fld"><label class="lbl">Photo (optionnel)</label>' + photoZone({ photo:null }) + '</div>' +
     '<div id="histoHint"></div>' +
     '<div class="shF"><button class="bS" id="x1">Annuler</button><button class="bP" id="k1">' + lbl[main] + '</button></div>' +
     '<button class="dgr" id="k1b" style="border-color:var(--bd);color:var(--tx2)">' + lbl[alt] + '</button>'
   );
-  clearInputs(['f_poke','f_sep','f_pa','f_pm','f_nom','f_dl']);
+  clearInputs(['f_poke','f_pa','f_pm','f_dl']);
   bindPhoto();
   $('x1').onclick = closeSheet;
+  $('x1t').onclick = closeSheet;
   $('k1').onclick = function(){ createLot(main, 'k1'); };
   $('k1b').onclick = function(){ createLot(alt, 'k1b'); };
   $('f_poke').oninput = function(){ showHistoHint(this.value.trim()); };
@@ -1619,9 +1621,9 @@ async function createLot(mode, btnId){
   }
   var l = {
     id: nid(), poke: poke,
-    nom: $('f_nom').value.trim(),
+    nom: '',
     nb: null, cards: {},
-    boite: '', sep: $('f_sep').value.trim(),
+    boite: '', sep: '',
     st: mode, pa: num($('f_pa').value), pm: num($('f_pm').value), pv: null,
     acheteur: '', notes: '', photo: photoId,
     dtCree: now(), dtPret: null, dtListe: null, dtVente: null, dtExp: null
