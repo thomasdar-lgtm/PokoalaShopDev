@@ -450,7 +450,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.54d';
+var APP_VERSION = '2.55d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2342,13 +2342,39 @@ function symNext(img){
   fb.textContent = (img.getAttribute('data-code') || '?').slice(0,3);
   img.replaceWith(fb);
 }
-function cdbImg(c){ return c.g ? c.g + '/low.webp' : ''; }
-/* visuel de carte : haute definition, repli sur la basse puis masquage */
-function cdbImgBig(c){ return c.g ? c.g + '/high.webp' : ''; }
+/* Visuels de cartes : chaine de sources.
+   TCGdex d'abord quand la base le fournit, puis pokemontcg.io, qui couvre
+   les sous-extensions (Galeries des Dresseurs, coffres brillants) pour
+   lesquelles la base n'a aucune URL. */
+function ptcgImg(c, big){
+  if(!c || !c.s || c.u == null) return '';
+  return 'https://images.pokemontcg.io/' + c.s + '/' + c.u + (big ? '_hires' : '') + '.png';
+}
+function cardSrcs(c, big){
+  var l = [];
+  if(c.g) l.push(c.g + (big ? '/high.webp' : '/low.webp'));
+  if(c.g && big) l.push(c.g + '/low.webp');
+  var pt = ptcgImg(c, big);
+  if(pt) l.push(pt);
+  if(big){ var pl = ptcgImg(c, false); if(pl) l.push(pl); }
+  return l;
+}
+function cdbImg(c){ return cardSrcs(c, false)[0] || ''; }
+function cdbImgBig(c){ return cardSrcs(c, true)[0] || ''; }
+
+/* balise image a sources multiples : passe a la suivante en cas d'echec */
+function cardImg(c, cls, big){
+  var l = cardSrcs(c, big);
+  if(!l.length) return '<span class="' + (cls || '') + '"></span>';
+  return '<img class="' + (cls || '') + '" loading="lazy" src="' + esc(l[0]) + '" alt="" ' +
+         'data-cs="' + esc(JSON.stringify(l)) + '" data-ci="0" onerror="cardImgErr(this)">';
+}
 function cardImgErr(img){
-  var lo = img.getAttribute('data-lo');
-  if(lo && img.src !== lo){ img.src = lo; img.removeAttribute('data-lo'); return; }
+  var l; try{ l = JSON.parse(img.getAttribute('data-cs') || '[]'); }catch(e){ l = []; }
+  var i = parseInt(img.getAttribute('data-ci') || '0', 10) + 1;
+  if(i < l.length){ img.setAttribute('data-ci', i); img.src = l[i]; return; }
   img.classList.add('gone');
+  img.style.visibility = 'hidden';
 }
 
 
@@ -2497,7 +2523,7 @@ function stkChips(c){
 function stkTile(c){
   var vs = stkVars(c), h = '';
   h += '<div class="stkC' + (stkCardQ(c.i) ? ' has' : '') + '" data-stkid="' + esc(c.i) + '">';
-  h += '<div class="im"><img loading="lazy" src="' + esc(cdbImg(c)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+  h += '<div class="im">' + cardImg(c, '') +
        '<span class="nu">' + esc(c.u) + '</span>' + (c.d ? '<span class="stkDot" title="variante déduite"></span>' : '') + '</div>';
   h += '<div class="na">' + esc(c.n) + '</div><div class="vs">' + stkChips(c);
   return h + '</div></div>';
@@ -2597,7 +2623,7 @@ async function stkRenderSearch(q){
         if(qq) det.push(vs.length === 1 ? ('×' + qq) : (VAR_FULL[vs[v]] + ' ×' + qq));
       }
       h += '<div class="stkRow" data-stkid="' + esc(c2.i) + '">' +
-           '<img loading="lazy" src="' + esc(cdbImg(c2)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+           cardImg(c2, '') +
            '<div class="rt"><b>' + esc(c2.n) + '</b><small>N° ' + esc(c2.u) + (det.length ? ' · ' + esc(det.join(' · ')) : '') + '</small>' +
            '<div class="rvs">' + stkChips(c2) + '</div></div>' +
            '<div class="rq">' + stkCardQ(c2.i) + '</div></div>';
@@ -2612,8 +2638,10 @@ function sheetStkCard(id){
   if(!c) return;
   var vs = stkVars(c), all = ['n','r','h'];
   var h = '<h3>' + esc(c.n) + '</h3><p class="sub">N° ' + esc(c.u) + ' · ' + esc(c.r || '—') + '</p>';
-  if(c.g) h += '<img class="shImg" src="' + esc(cdbImgBig(c)) + '" data-lo="' + esc(cdbImg(c)) + '" ' +
-               'alt="" onerror="cardImgErr(this)" data-stkzoom="' + esc(c.i) + '">';
+  var big = cardSrcs(c, true);
+  if(big.length) h += '<img class="shImg" src="' + esc(big[0]) + '" alt="" ' +
+      'data-cs="' + esc(JSON.stringify(big)) + '" data-ci="0" onerror="cardImgErr(this)" ' +
+      'data-stkzoom="' + esc(c.i) + '">';
   if(c.d) h += '<div class="stkWarn">Variantes déduites de la rareté, non certifiées par TCGdex. Corrige-les si besoin.</div>';
   var solo = vs.length === 1;
   for(var i=0;i<vs.length;i++){
@@ -2924,7 +2952,7 @@ function pickRows(keys, inLot){
     var qte = inLot[key] || 0;
 
     h += '<div class="pkR">' +
-         (c ? '<img loading="lazy" src="' + esc(cdbImg(c)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' : '<span class="pkNo"></span>') +
+         (c ? cardImg(c, '') : '<span class="pkNo"></span>') +
          '<div class="pkT"><b>' + esc(c ? c.n : p[0]) + '</b><small>' + esc(sub) + '</small>' +
          '<small class="pkD">stock : ' + dispo + '</small></div>' +
          '<div class="pkC">' +
