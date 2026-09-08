@@ -290,11 +290,17 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:#E3350D;z-index:9999;pointer-events:none}
 /* ===== MODULE STOCK ===== */
 .stkBar{display:flex;align-items:center;gap:8px;margin:0 0 12px}
-.stkBack{background:var(--surf);border:1px solid var(--bd);color:var(--tx);border-radius:9px;padding:7px 11px;font-size:13px;font-weight:700;cursor:pointer;flex:none}
+.stkBack{background:var(--surf);border:1px solid var(--bd);color:var(--tx);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0}
+.stkBack svg{width:19px;height:19px;display:block}
+.stkBack:active{background:#0c1428}
 .stkTit{font-weight:800;font-size:15px;line-height:1.2;flex:1;min-width:0}
 .stkTit small{display:block;color:var(--tx3);font-weight:600;font-size:11px;margin-top:2px}
 .stkSet{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:7px;cursor:pointer}
 .stkSet b{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ssym{width:26px;height:26px;object-fit:contain;flex:none;filter:brightness(0) invert(1);opacity:.9}
+.scode{font-size:10px;font-weight:900;letter-spacing:.7px;color:var(--tx3);background:#0c1428;border:1px solid var(--bd);border-radius:5px;padding:2px 5px;flex:none}
+.stkTit .th{display:flex;align-items:center;gap:7px}
+.stkTit .th .ssym{width:22px;height:22px}
 .stkSet .sc{font-size:12px;font-weight:800;color:var(--blu);flex:none}
 .stkSet .sc.z{color:var(--tx3);font-weight:600}
 .stkSerie{color:var(--tx3);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin:15px 0 7px}
@@ -303,7 +309,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkC.has{border-color:var(--blu)}
 .stkC .im{position:relative;background:#0c1428;aspect-ratio:245/342}
 .stkC .im img{width:100%;height:100%;object-fit:cover;display:block}
-.stkC .nu{position:absolute;top:3px;left:3px;background:rgba(0,7,26,.82);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px}
+.stkC .nu{position:absolute;top:4px;left:4px;background:rgba(0,7,26,.88);color:#fff;font-size:13px;font-weight:900;letter-spacing:-.2px;padding:2px 7px;border-radius:6px;line-height:1.15}
 .stkC .na{font-size:10px;font-weight:700;padding:4px 5px 2px;line-height:1.15;height:26px;overflow:hidden}
 .stkC .vs{display:flex;gap:3px;padding:0 4px 5px}
 .stkV{flex:1;border:1px solid var(--bd);background:#0c1428;border-radius:6px;padding:4px 0;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
@@ -406,7 +412,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.37d';
+var APP_VERSION = '2.38d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2333,8 +2339,11 @@ function stkRenderSets(){
     var arr = bySerie[order[o]];
     for(var j=0;j<arr.length;j++){
       var st = arr[j], n = per[st.id] || 0;
-      h += '<div class="stkSet" data-stkset="' + esc(st.id) + '"><b>' + esc(st.name) + '</b>' +
-           '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n + ' cartes' : '—') + '</span></div>';
+      h += '<div class="stkSet" data-stkset="' + esc(st.id) + '">' +
+           (st.sym ? '<img class="ssym" loading="lazy" src="' + esc(st.sym) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
+           '<b>' + esc(st.name) + '</b>' +
+           (st.code ? '<span class="scode">' + esc(st.code) + '</span>' : '') +
+           '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n : '—') + '</span></div>';
     }
   }
   $('view').innerHTML = h;
@@ -2360,10 +2369,13 @@ function stkRenderGrid(){
   var arr = cdbBySet[stkSet] || [];
   var tot = 0;
   for(var j=0;j<arr.length;j++) tot += stkCardQ(arr[j].i);
-  var h = '<div class="stkBar"><button class="stkBack" data-stkback="1">←</button>' +
-          '<div class="stkTit">' + esc(s ? s.name : stkSet) +
+  var ico = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
+  var h = '<div class="stkBar"><button class="stkBack" data-stkback="1" aria-label="Retour">' + ico + '</button>' +
+          '<div class="stkTit"><span class="th">' +
+          (s && s.sym ? '<img class="ssym" src="' + esc(s.sym) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
+          esc(s ? s.name : stkSet) +
+          (s && s.code ? '<span class="scode">' + esc(s.code) + '</span>' : '') + '</span>' +
           '<small>' + arr.length + ' cartes · ' + tot + ' en stock</small></div></div>';
-  h += '<div class="stkWarn">Appui court : +1 en NM. Appui long : −1. Touche l\'image pour gérer les états et les variantes.</div>';
   h += '<div class="stkGrid">';
   for(var k=0;k<arr.length;k++) h += stkTile(arr[k]);
   $('view').innerHTML = h + '</div>';
