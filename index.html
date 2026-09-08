@@ -57,6 +57,9 @@ header{position:sticky;top:0;z-index:60;background:var(--bg);padding:calc(10px +
 .iBtn{background:var(--surf2);border:0;color:var(--tx2);width:32px;height:32px;border-radius:9px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .srch{position:relative;margin-bottom:10px}
 .srch input{width:100%;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:10px 34px 10px 34px;color:var(--tx);font-size:14px;outline:none}
+.srch input::-webkit-search-cancel-button,
+.srch input::-webkit-search-decoration,
+.srch input::-webkit-search-results-button{-webkit-appearance:none;appearance:none;display:none}
 .srch input:focus{border-color:var(--red)}
 .srch .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:13px}
 .srch .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--surf2);border:0;color:var(--tx2);width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer}
@@ -328,9 +331,9 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkV.on{border-color:var(--blu);background:rgba(56,139,253,.13)}
 .stkV.on .vq{color:var(--blu)}
 .stkDot{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:#d29922;opacity:.85}
-.stkTot{background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:12px;display:flex;gap:16px}
-.stkTot div{flex:1}
-.stkTot span{display:block;font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.stkTot{background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:12px;display:flex;gap:12px}
+.stkTot div{flex:1;min-width:0}
+.stkTot span{display:block;font-size:9px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stkTot b{font-size:19px;font-weight:900}
 .stkRow{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:9px 11px;margin-bottom:7px;cursor:pointer}
 .stkRow img{width:36px;height:50px;object-fit:cover;border-radius:5px;background:#0c1428;flex:none}
@@ -338,6 +341,12 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkRow .rt b{display:block;font-size:13px;font-weight:700}
 .stkRow .rt small{color:var(--tx3);font-size:11px;font-weight:600}
 .stkRow .rq{font-size:15px;font-weight:900;color:var(--blu);flex:none}
+.stkRow{align-items:flex-start}
+.stkRow .rt{display:flex;flex-direction:column;gap:5px}
+.stkRow .rvs{display:flex;gap:5px;margin-top:1px}
+.stkRow .rvs .stkV{flex:0 0 auto;min-width:52px;padding:3px 8px}
+.stkRow .rvs .stkV.solo{min-width:44px;padding:4px 8px}
+.stkRow .rvs .stkV .vq{font-size:13px}
 .shImg{display:block;width:100%;max-width:196px;margin:2px auto 12px;border-radius:9px;background:#0c1428;aspect-ratio:245/342;object-fit:cover;box-shadow:0 6px 20px rgba(0,0,0,.42);cursor:zoom-in}
 .shImg.gone{display:none}
 .shV{border:1px solid var(--bd);border-radius:10px;padding:10px 11px;margin-bottom:9px}
@@ -441,7 +450,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.49d';
+var APP_VERSION = '2.52d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2451,19 +2460,23 @@ function stkRenderSets(){
   $('view').innerHTML = h;
 }
 
+/* compteurs de variantes, partages entre la grille et les resultats de recherche */
+function stkChips(c){
+  var vs = stkVars(c), solo = vs.length === 1, out = '';
+  for(var i=0;i<vs.length;i++){
+    var q = stkVarQ(c.i, vs[i]);
+    out += '<div class="stkV ' + (q ? 'on' : 'q0') + (solo ? ' solo' : '') + '" data-stkv="' + esc(c.i) + '|' + vs[i] + '">' +
+           (solo ? '' : '<span class="vl">' + VAR_LBL[vs[i]] + '</span>') +
+           '<span class="vq">' + q + '</span></div>';
+  }
+  return out;
+}
 function stkTile(c){
   var vs = stkVars(c), h = '';
   h += '<div class="stkC' + (stkCardQ(c.i) ? ' has' : '') + '" data-stkid="' + esc(c.i) + '">';
   h += '<div class="im"><img loading="lazy" src="' + esc(cdbImg(c)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
        '<span class="nu">' + esc(c.u) + '</span>' + (c.d ? '<span class="stkDot" title="variante déduite"></span>' : '') + '</div>';
-  h += '<div class="na">' + esc(c.n) + '</div><div class="vs">';
-  var solo = vs.length === 1;
-  for(var i=0;i<vs.length;i++){
-    var q = stkVarQ(c.i, vs[i]);
-    h += '<div class="stkV ' + (q ? 'on' : 'q0') + (solo ? ' solo' : '') + '" data-stkv="' + esc(c.i) + '|' + vs[i] + '">' +
-         (solo ? '' : '<span class="vl">' + VAR_LBL[vs[i]] + '</span>') +
-         '<span class="vq">' + q + '</span></div>';
-  }
+  h += '<div class="na">' + esc(c.n) + '</div><div class="vs">' + stkChips(c);
   return h + '</div></div>';
 }
 
@@ -2527,9 +2540,17 @@ async function stkRenderSearch(q){
   var tot = 0;
   for(var t=0;t<show.length;t++) tot += stkCardQ(show[t].i);
 
-  var h = '<div class="stkTot"><div><span>' + (withQ.length ? 'En stock' : 'Cartes trouvées') + '</span><b>' +
-          (withQ.length ? tot : show.length) + '</b></div><div><span>Extensions</span><b>' +
-          Object.keys(grp).length + '</b></div></div>';
+  var h;
+  if(withQ.length){
+    h = '<div class="stkTot">' +
+        '<div><span>Exemplaires</span><b>' + tot + '</b></div>' +
+        '<div><span>Différentes</span><b>' + withQ.length + '</b></div>' +
+        '<div><span>Extensions</span><b>' + Object.keys(grp).length + '</b></div></div>';
+  } else {
+    h = '<div class="stkTot">' +
+        '<div><span>Cartes trouvées</span><b>' + show.length + '</b></div>' +
+        '<div><span>Extensions</span><b>' + Object.keys(grp).length + '</b></div></div>';
+  }
   if(!withQ.length) h += '<div class="stkWarn">Aucun exemplaire en stock. Voici les cartes existantes.</div>';
   for(var o=0;o<order.length;o++){
     var a = grp[order[o]];
@@ -2545,7 +2566,8 @@ async function stkRenderSearch(q){
       }
       h += '<div class="stkRow" data-stkid="' + esc(c2.i) + '">' +
            '<img loading="lazy" src="' + esc(cdbImg(c2)) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
-           '<div class="rt"><b>' + esc(c2.n) + '</b><small>N° ' + esc(c2.u) + (det.length ? ' · ' + esc(det.join(' · ')) : '') + '</small></div>' +
+           '<div class="rt"><b>' + esc(c2.n) + '</b><small>N° ' + esc(c2.u) + (det.length ? ' · ' + esc(det.join(' · ')) : '') + '</small>' +
+           '<div class="rvs">' + stkChips(c2) + '</div></div>' +
            '<div class="rq">' + stkCardQ(c2.i) + '</div></div>';
     }
   }
@@ -2697,7 +2719,21 @@ function stkRefresh(id){
     return;
   }
   var row = document.querySelector('.stkRow[data-stkid="' + id.replace(/"/g,'') + '"]');
-  if(row){ var rq = row.querySelector('.rq'); if(rq) rq.textContent = stkCardQ(id); }
+  if(row){
+    var rq = row.querySelector('.rq');
+    if(rq) rq.textContent = stkCardQ(id);
+    var rvs = row.querySelector('.rvs');
+    if(rvs) rvs.innerHTML = stkChips(c);
+    var sm = row.querySelector('.rt small');
+    if(sm){
+      var vs2 = stkVars(c), det2 = [];
+      for(var v2=0;v2<vs2.length;v2++){
+        var q2 = stkVarQ(id, vs2[v2]);
+        if(q2) det2.push(vs2.length === 1 ? ('×' + q2) : (VAR_FULL[vs2[v2]] + ' ×' + q2));
+      }
+      sm.textContent = 'N° ' + c.u + (det2.length ? ' · ' + det2.join(' · ') : '');
+    }
+  }
 }
 
 document.addEventListener('visibilitychange', function(){
