@@ -441,7 +441,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.48d';
+var APP_VERSION = '2.49d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2210,6 +2210,15 @@ window.addEventListener('load', function(){
   };
   document.head.appendChild(s);
   if('serviceWorker' in navigator){
+    /* un nouveau service worker prend la main : recharger une fois pour afficher
+       la nouvelle version. hadCtrl evite de recharger a la toute premiere visite,
+       ou clients.claim() declenche aussi cet evenement. */
+    var hadCtrl = !!navigator.serviceWorker.controller, swReloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(!hadCtrl || swReloaded || sheetOpen) return;
+      swReloaded = true;
+      location.reload();
+    });
     navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function(reg){
       reg.update();
       document.addEventListener('visibilitychange', function(){

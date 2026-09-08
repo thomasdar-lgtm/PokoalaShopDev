@@ -1,4 +1,4 @@
-const CACHE_VERSION = '2.48d';
+const CACHE_VERSION = '2.49d';
 const CACHE_NAME = 'pokoalashopdev-v' + CACHE_VERSION;
 /* cache non versionne : la base de cartes est versionnee par son URL (?v=N),
    inutile de re-telecharger 2,7 Mo a chaque montee de version */
@@ -58,8 +58,17 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  /* la page et le manifeste sont servis par GitHub Pages avec un max-age :
+     sans 'reload', le fetch peut etre satisfait par le cache HTTP du navigateur
+     et la mise a jour n'arrive jamais */
+  const isShell = e.request.mode === 'navigate' ||
+                  /\/(index\.html|manifest\.json)$/.test(url.pathname) ||
+                  url.pathname.endsWith('/');
+  const req = isShell ? new Request(e.request.url, { cache: 'reload', credentials: 'same-origin' })
+                      : e.request;
+
   e.respondWith(
-    fetch(e.request)
+    fetch(req)
       .then(r => {
         const copy = r.clone();
         caches.open(CACHE_NAME).then(c => c.put(e.request, copy));
