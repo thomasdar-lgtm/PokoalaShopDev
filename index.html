@@ -320,11 +320,11 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkC .im{position:relative;background:#0c1428;aspect-ratio:245/342}
 .stkC .im img{width:100%;height:100%;object-fit:cover;display:block}
 .stkC .nu{position:absolute;top:4px;left:4px;background:rgba(0,7,26,.88);color:#fff;font-size:13px;font-weight:900;letter-spacing:-.2px;padding:2px 7px;border-radius:6px;line-height:1.15}
-.stkC .na{font-size:10px;font-weight:700;padding:4px 5px 2px;line-height:1.15;height:26px;overflow:hidden}
-.stkC .vs{display:flex;gap:3px;padding:0 4px 5px}
-.stkV{flex:1;border:1px solid var(--bd);background:#0c1428;border-radius:6px;padding:4px 0;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.stkC .na{font-size:10px;font-weight:700;padding:4px 5px 4px;line-height:1.15;height:28px;overflow:hidden}
+.stkC .vs{display:flex;gap:4px;padding:0 4px 6px}
+.stkV{flex:1;border:1px solid var(--bd);background:#0c1428;border-radius:7px;padding:8px 0 7px;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 .stkV .vl{display:block;font-size:8px;font-weight:800;color:var(--tx3);letter-spacing:.3px}
-.stkV.solo{padding:6px 0}
+.stkV.solo{padding:11px 0 10px}
 .stkV.solo .vq{font-size:16px}
 .stkV .vq{display:block;font-size:13px;font-weight:900;line-height:1.1}
 .stkV.q0 .vq{color:var(--tx3);opacity:.45}
@@ -344,8 +344,8 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkRow{align-items:flex-start}
 .stkRow .rt{display:flex;flex-direction:column;gap:5px}
 .stkRow .rvs{display:flex;gap:5px;margin-top:1px}
-.stkRow .rvs .stkV{flex:0 0 auto;min-width:52px;padding:3px 8px}
-.stkRow .rvs .stkV.solo{min-width:44px;padding:4px 8px}
+.stkRow .rvs .stkV{flex:0 0 auto;min-width:54px;padding:7px 9px 6px}
+.stkRow .rvs .stkV.solo{min-width:46px;padding:9px 9px 8px}
 .stkRow .rvs .stkV .vq{font-size:13px}
 .shImg{display:block;width:100%;max-width:196px;margin:2px auto 12px;border-radius:9px;background:#0c1428;aspect-ratio:245/342;object-fit:cover;box-shadow:0 6px 20px rgba(0,0,0,.42);cursor:zoom-in}
 .shImg.gone{display:none}
@@ -450,7 +450,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.55d';
+var APP_VERSION = '2.56d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2697,7 +2697,12 @@ function stkBind(){
       return;
     }
     if((t = e.target.closest('.stkRow[data-stkid]'))){ sheetStkCard(t.getAttribute('data-stkid')); return; }
-    if((t = e.target.closest('.stkC[data-stkid]'))){ sheetStkCard(t.getAttribute('data-stkid')); return; }
+    /* uniquement depuis l'image : un appui sur le nom ou dans un interstice
+       ne doit pas ouvrir la fiche par surprise pendant la saisie */
+    if(e.target.closest('.stkC .im')){
+      var tc = e.target.closest('.stkC[data-stkid]');
+      if(tc){ sheetStkCard(tc.getAttribute('data-stkid')); return; }
+    }
   });
 
   /* appui long sur un compteur = -1 */
