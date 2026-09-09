@@ -314,6 +314,10 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .stkSet .sc{font-size:12px;font-weight:800;color:var(--blu);flex:none}
 .stkSet .sc.z{color:var(--tx3);font-weight:600}
 .stkSerie{color:var(--tx3);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin:15px 0 7px}
+.stkFB{display:flex;gap:6px;margin:0 0 11px}
+.stkFB .sg{display:flex;background:var(--surf);border:1px solid var(--bd);border-radius:9px;padding:2px;gap:2px;flex:1;min-width:0}
+.stkFB button{flex:1;min-width:0;background:none;border:0;color:var(--tx3);font-size:11px;font-weight:700;padding:6px 2px;border-radius:7px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stkFB button.on{background:var(--surf2);color:var(--tx)}
 .stkGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .stkC{background:var(--surf);border:1px solid var(--bd);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
 .stkC.has{border-color:var(--blu)}
@@ -450,7 +454,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.56d';
+var APP_VERSION = '2.57d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2252,6 +2256,8 @@ var stock = {}, stkOv = {}, stkMoves = [], stkRev = 0;
 var stkFileId = null, stkBaseRev = 0, stkPending = [];
 var stkTimer = null, stkSaving = false, stkLoaded = false;
 var stkSet = null, stkLp = null, stkLpFired = false;
+var stkFilt = localStorage.getItem(LS + 'filt') || 'all';   /* all | has | none */
+var stkTri  = localStorage.getItem(LS + 'tri')  || 'num';   /* num | qty */
 
 function stkKey(id, v, e){ return id + '|' + v + '|' + e; }
 function stkQ(id, v, e){ return stock[stkKey(id, v, e)] || 0; }
@@ -2548,10 +2554,38 @@ async function stkRenderGrid(){
   }
   var arr = [];
   for(var pi=0;pi<parts.length;pi++) arr = arr.concat(setCards[parts[pi]] || []);
-  var tot = 0;
-  for(var j=0;j<arr.length;j++) tot += stkCardQ(arr[j].i);
-  var h = head(arr.length + ' cartes · ' + tot + ' en stock') + '<div class="stkGrid">';
-  for(var k=0;k<arr.length;k++) h += stkTile(arr[k]);
+  var tot = 0, poss = 0;
+  for(var j=0;j<arr.length;j++){ var q = stkCardQ(arr[j].i); tot += q; if(q) poss++; }
+
+  var vue = arr;
+  if(stkFilt === 'has')  vue = arr.filter(function(c){ return stkCardQ(c.i) > 0; });
+  if(stkFilt === 'none') vue = arr.filter(function(c){ return stkCardQ(c.i) === 0; });
+  if(stkTri === 'qty'){
+    vue = vue.slice().sort(function(a, b){
+      var d2 = stkCardQ(b.i) - stkCardQ(a.i);
+      return d2 || (arr.indexOf(a) - arr.indexOf(b));
+    });
+  }
+
+  function seg(attr, val, cur, lbl){
+    return '<button class="' + (cur === val ? 'on' : '') + '" data-' + attr + '="' + val + '">' + lbl + '</button>';
+  }
+  var bar = '<div class="stkFB"><div class="sg">' +
+    seg('stkf','all',stkFilt,'Toutes') + seg('stkf','has',stkFilt,'J\'en ai') + seg('stkf','none',stkFilt,'Manquantes') +
+    '</div><div class="sg">' +
+    seg('stkt','num',stkTri,'N°') + seg('stkt','qty',stkTri,'Quantité') +
+    '</div></div>';
+
+  var sub = arr.length + ' cartes · ' + poss + ' possédées · ' + tot + ' en stock';
+  var h = head(sub) + bar;
+  if(!vue.length){
+    h += '<div class="pkE">' + (stkFilt === 'has' ? 'Aucune carte saisie dans cette extension.'
+                                                  : 'Tu as toutes les cartes de cette extension.') + '</div>';
+    $('view').innerHTML = h;
+    return;
+  }
+  h += '<div class="stkGrid">';
+  for(var k=0;k<vue.length;k++) h += stkTile(vue[k]);
   $('view').innerHTML = h + '</div>';
 }
 
@@ -2688,6 +2722,16 @@ function stkBind(){
     if((t = e.target.closest('[data-stkset]'))){
       stkSet = t.getAttribute('data-stkset');
       history.pushState({ d:3 }, '');
+      window.scrollTo(0,0); render(); return;
+    }
+    if((t = e.target.closest('[data-stkf]'))){
+      stkFilt = t.getAttribute('data-stkf');
+      localStorage.setItem(LS + 'filt', stkFilt);
+      window.scrollTo(0,0); render(); return;
+    }
+    if((t = e.target.closest('[data-stkt]'))){
+      stkTri = t.getAttribute('data-stkt');
+      localStorage.setItem(LS + 'tri', stkTri);
       window.scrollTo(0,0); render(); return;
     }
     if((t = e.target.closest('[data-stkv]'))){
