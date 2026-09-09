@@ -463,7 +463,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.59d';
+var APP_VERSION = '2.61d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -2255,6 +2255,8 @@ window.addEventListener('load', function(){
 
 /* ===================== MODULE STOCK ===================== */
 var STK_FILE = 'dvstk.json';
+var MV_FILE  = 'dvstkmv.json';   /* journal a part : il grossit sans fin, le stock non */
+var MV_CAP   = 4000;             /* mouvements conserves */
 var CARDS_VER = '5';   /* fichiers cards/ et pks_names.json */
 var SETS_VER  = '6';   /* pks_sets.json seul, pour ne pas invalider les cartes deja en cache */
 var VAR_LBL = { n:'Norm', r:'Rev', h:'Holo' };
@@ -2265,10 +2267,12 @@ var ET_LBL = { nm:'NM', jo:'Joué', ab:'Abîmé' };
 
 var cdb = null, cdbById = {};
 var stock = {}, stkOv = {}, stkMoves = [], stkRev = 0;
+var mvNew = [], mvCount = 0, mvFileId = null, mvLoaded = false, mvTimer = null, mvSaving = false;
 var stkFileId = null, stkBaseRev = 0, stkPending = [];
 var stkTimer = null, stkSaving = false, stkLoaded = false;
 var stkSet = null, stkLp = null, stkLpFired = false;
 var stkArr = [], stkQry = '', stkJournal = false;
+var mvFilt = localStorage.getItem(LS + 'mvf') || 'lot';   /* all | lot */
 var stkFilt = localStorage.getItem(LS + 'filt') || 'all';   /* all | has | none */
 var stkTri  = localStorage.getItem(LS + 'tri')  || 'num';   /* num | qty */
 
@@ -2408,9 +2412,15 @@ async function stkFind(){
 function stkApply(data){
   stock = (data && data.stock) || {};
   stkOv = (data && data.ov) || {};
-  stkMoves = (data && data.moves) || [];
   stkRev = (data && data.rev) || 0;
+  mvCount = (data && data.mvCount) || 0;
   stkBaseRev = stkRev;
+  /* migration : un ancien fichier porte encore le journal, on le bascule */
+  if(data && data.moves && data.moves.length){
+    mvNew = data.moves.concat(mvNew);
+    mvCount = Math.max(mvCount, data.moves.length);
+    mvQueue();
+  }
 }
 async function stkLoad(){
   if(stkLoaded) return;
@@ -2424,7 +2434,7 @@ async function stkLoad(){
   }catch(e){ toast('Stock : lecture impossible'); }
 }
 function stkBody(){
-  return JSON.stringify({ rev: stkRev, stock: stock, ov: stkOv, moves: stkMoves, at: now(), v: APP_VERSION });
+  return JSON.stringify({ rev: stkRev, stock: stock, ov: stkOv, mvCount: mvCount, at: now(), v: APP_VERSION });
 }
 async function stkWrite(){
   var meta = { name: STK_FILE, parents: ['appDataFolder'] };
@@ -2470,19 +2480,92 @@ async function stkSave(){
 }
 function stkQueue(){ clearTimeout(stkTimer); stkTimer = setTimeout(stkSave, 2500); }
 
+/* ---- journal : fichier separe, ecrit plus rarement ---- */
+async function mvFind(){
+  var url = 'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=10&fields=files(id,name)&q=' +
+    encodeURIComponent("name = '" + MV_FILE + "' and trashed=false");
+  var r = await api(url);
+  var j = await r.json();
+  return (j.files && j.files[0]) ? j.files[0].id : null;
+}
+async function mvLoad(){
+  if(mvLoaded) return stkMoves;
+  var base = [];
+  try{
+    if(!mvFileId) mvFileId = await mvFind();
+    if(mvFileId){
+      var r = await api('https://www.googleapis.com/drive/v3/files/' + mvFileId + '?alt=media');
+      var j = await r.json();
+      base = (j && j.moves) || [];
+    }
+  }catch(e){ toast('Journal : lecture impossible'); }
+  /* mvNew contient ce qui n'est pas encore ecrit : eviter de le compter deux fois */
+  var seen = {};
+  for(var i=0;i<base.length;i++) seen[base[i].t + '|' + base[i].c + '|' + base[i].d] = 1;
+  var add = mvNew.filter(function(m){ return !seen[m.t + '|' + m.c + '|' + m.d]; });
+  stkMoves = base.concat(add);
+  stkMoves.sort(function(a, b){ return a.t - b.t; });
+  mvCount = Math.max(mvCount, stkMoves.length);
+  mvLoaded = true;
+  return stkMoves;
+}
+async function mvSave(){
+  if(mvSaving || !mvNew.length) return;
+  mvSaving = true;
+  var envoi = mvNew.slice();
+  try{
+    if(!mvFileId) mvFileId = await mvFind();
+    var base = [];
+    if(mvFileId){
+      try{
+        var r = await api('https://www.googleapis.com/drive/v3/files/' + mvFileId + '?alt=media');
+        var j = await r.json();
+        base = (j && j.moves) || [];
+      }catch(e){ base = []; }
+    }
+    var seen = {};
+    for(var i=0;i<base.length;i++) seen[base[i].t + '|' + base[i].c + '|' + base[i].d] = 1;
+    for(var k=0;k<envoi.length;k++){
+      var key = envoi[k].t + '|' + envoi[k].c + '|' + envoi[k].d;
+      if(!seen[key]){ base.push(envoi[k]); seen[key] = 1; }
+    }
+    base.sort(function(a, b){ return a.t - b.t; });
+    if(base.length > MV_CAP) base = base.slice(-MV_CAP);
+    var body = JSON.stringify({ moves: base, at: now(), v: APP_VERSION });
+    if(!mvFileId){
+      var fd = new FormData();
+      fd.append('metadata', new Blob([JSON.stringify({ name: MV_FILE, parents: ['appDataFolder'] })], { type:'application/json' }));
+      fd.append('file', new Blob([body], { type:'application/json' }));
+      var rr = await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method:'POST', body: fd });
+      mvFileId = (await rr.json()).id;
+    } else {
+      await api('https://www.googleapis.com/upload/drive/v3/files/' + mvFileId + '?uploadType=media', {
+        method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: body
+      });
+    }
+    mvNew = mvNew.slice(envoi.length);
+    mvCount = base.length + mvNew.length;
+    if(mvLoaded){ stkMoves = base.concat(mvNew); }
+  }catch(e){ /* on retentera : mvNew est conserve */ }
+  mvSaving = false;
+  if(mvNew.length) mvQueue();
+}
+function mvQueue(){ clearTimeout(mvTimer); mvTimer = setTimeout(mvSave, 20000); }
+
 function stkAdd(id, v, e, d, src){
   var k = stkKey(id, v, e), cur = stock[k] || 0, nv = Math.max(0, cur + d);
   if(nv === cur) return false;
   stock[k] = nv;
   if(!nv) delete stock[k];
   var mv = { t: now(), c: id, v: v, e: e, d: nv - cur, w: who || '', s: src || 'saisie' };
-  stkMoves.push(mv); stkPending.push(mv);
-  stkQueue();
+  stkPending.push(mv);
+  mvNew.push(mv); mvCount++;
+  if(mvLoaded) stkMoves.push(mv);
+  stkQueue(); mvQueue();
   return true;
 }
 function stkSetOv(id, mask){
   if(mask) stkOv[id] = mask; else delete stkOv[id];
-  stkPending.push({ t: now(), c: id, v:'-', e:'-', d:0, w: who || '', s:'variante' });
   stkQueue();
 }
 
@@ -2514,7 +2597,7 @@ function stkRenderSets(){
   h += '<div class="stkJB" data-stkj="1">' +
        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
        '<path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>' +
-       'Journal des mouvements<span class="jc">' + stkMoves.length + '</span></div>';
+       'Mouvements de stock<span class="jc">' + (mvLoaded ? stkMoves.length : mvCount) + '</span></div>';
   /* reporter le stock des sous-extensions sur leur parent */
   for(var sk in per){
     var rt = rootSet(sk);
@@ -2739,7 +2822,12 @@ async function stkRenderJournal(){
   var ico = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
   function head(sub){
     return '<div class="stkBar"><button class="stkBack" data-stkjb="1" aria-label="Retour">' + ico + '</button>' +
-           '<div class="stkTit">Journal des mouvements<small>' + sub + '</small></div></div>';
+           '<div class="stkTit">Mouvements de stock<small>' + sub + '</small></div></div>';
+  }
+  if(!mvLoaded){
+    $('view').innerHTML = head('chargement…');
+    await mvLoad();
+    if(!stkJournal || tab !== 'stock') return;
   }
   if(!stkMoves.length){
     $('view').innerHTML = head('aucun mouvement') + '<div class="pkE">Rien n\'a encore été saisi.</div>';
@@ -2747,15 +2835,32 @@ async function stkRenderJournal(){
   }
 
   var LIM = 300;
-  var list = stkMoves.slice(-LIM).reverse();
+  var nLot = 0;
+  for(var z=0;z<stkMoves.length;z++) if(stkMoves[z].s === 'lot' || stkMoves[z].s === 'retour') nLot++;
+
+  var src = (mvFilt === 'lot')
+    ? stkMoves.filter(function(m){ return m.s === 'lot' || m.s === 'retour'; })
+    : stkMoves;
+  var list = src.slice(-LIM).reverse();
+
+  var bar = '<div class="stkFB"><div class="sg">' +
+    '<button class="' + (mvFilt === 'lot' ? 'on' : '') + '" data-mvf="lot">Lots (' + nLot + ')</button>' +
+    '<button class="' + (mvFilt === 'all' ? 'on' : '') + '" data-mvf="all">Tout (' + stkMoves.length + ')</button>' +
+    '</div></div>';
+
   var keys = list.map(function(m){ return m.c; });
-  $('view').innerHTML = head('chargement…');
+  $('view').innerHTML = head('chargement…') + bar;
   await ensureCards(keys);
   if(!stkJournal || tab !== 'stock') return;
 
-  var sub = stkMoves.length + ' mouvement' + (stkMoves.length > 1 ? 's' : '');
-  if(stkMoves.length > LIM) sub += ' · ' + LIM + ' derniers affichés';
-  var h = head(sub), jour = null;
+  var sub = src.length + ' mouvement' + (src.length > 1 ? 's' : '');
+  if(src.length > LIM) sub += ' · ' + LIM + ' derniers affichés';
+  var h = head(sub) + bar, jour = null;
+
+  if(!list.length){
+    $('view').innerHTML = h + '<div class="pkE">Aucun mouvement lié à un lot pour l\'instant. Les cartes piochées ou remises apparaîtront ici.</div>';
+    return;
+  }
 
   for(var i=0;i<list.length;i++){
     var m = list[i], c = cdbById[m.c];
@@ -2837,6 +2942,11 @@ function stkBind(){
       stkSet = t.getAttribute('data-stkset');
       stkQry = ''; stkJournal = false;
       history.pushState({ d:3 }, '');
+      window.scrollTo(0,0); render(); return;
+    }
+    if((t = e.target.closest('[data-mvf]'))){
+      mvFilt = t.getAttribute('data-mvf');
+      localStorage.setItem(LS + 'mvf', mvFilt);
       window.scrollTo(0,0); render(); return;
     }
     if((t = e.target.closest('[data-stkj]'))){
@@ -2974,7 +3084,9 @@ function stkRefresh(id){
 }
 
 document.addEventListener('visibilitychange', function(){
-  if(document.visibilityState === 'hidden' && stkPending.length){ clearTimeout(stkTimer); stkSave(); }
+  if(document.visibilityState !== 'hidden') return;
+  if(stkPending.length){ clearTimeout(stkTimer); stkSave(); }
+  if(mvNew.length){ clearTimeout(mvTimer); mvSave(); }
 });
 
 /* ═══ LIAISON LOTS <-> STOCK ═══
