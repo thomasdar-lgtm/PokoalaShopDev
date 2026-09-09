@@ -296,12 +296,12 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .tagBox{background:var(--surf2);border-radius:var(--r2);padding:11px 12px;font-size:12px;color:var(--tx2);line-height:1.55;margin:0 18px 12px;word-break:break-word;max-height:130px;overflow-y:auto}
 body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:#E3350D;z-index:9999;pointer-events:none}
 /* ===== MODULE STOCK ===== */
-.stkBar{display:flex;align-items:center;gap:8px;margin:0 0 12px}
-.stkBack{background:var(--surf);border:1px solid var(--bd);color:var(--tx);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0}
-.stkBack svg{width:19px;height:19px;display:block}
+.stkBar{display:flex;align-items:center;gap:10px;margin:0 0 11px;padding:2px 0}
+.stkBack{background:var(--surf);border:1px solid var(--bd);color:var(--tx);border-radius:11px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0}
+.stkBack svg{width:22px;height:22px;display:block}
 .stkBack:active{background:#0c1428}
-.stkTit{font-weight:800;font-size:15px;line-height:1.2;flex:1;min-width:0}
-.stkTit small{display:block;color:var(--tx3);font-weight:600;font-size:11px;margin-top:2px}
+.stkTit{font-weight:800;font-size:17px;line-height:1.25;flex:1;min-width:0}
+.stkTit small{display:block;color:var(--tx3);font-weight:600;font-size:11.5px;margin-top:3px}
 .stkSet{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:7px;cursor:pointer}
 .ssym{width:24px;height:24px;object-fit:contain;flex:none}
 .ssym.gone{display:none}
@@ -310,10 +310,14 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .sinfo b{font-size:14px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .scode{font-size:9px;font-weight:900;letter-spacing:.6px;color:var(--tx3);background:#0c1428;border:1px solid var(--bd);border-radius:4px;padding:2px 5px;flex:none}
 .stkTit .th{display:flex;align-items:center;gap:7px;min-width:0}
-.stkTit .th .ssym,.stkTit .th .sfb{width:21px;height:21px}
+.stkTit .th .ssym,.stkTit .th .sfb{width:24px;height:24px}
 .stkSet .sc{font-size:12px;font-weight:800;color:var(--blu);flex:none}
 .stkSet .sc.z{color:var(--tx3);font-weight:600}
 .stkSerie{color:var(--tx3);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin:15px 0 7px}
+.stkSrch{position:relative;margin:0 0 10px}
+.stkSrch input{width:100%;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:10px 34px 10px 13px;color:var(--tx);font-size:14px;outline:none}
+.stkSrch input::-webkit-search-cancel-button,.stkSrch input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+.stkSrch .sx{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--surf2);border:0;color:var(--tx2);width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer}
 .stkFB{display:flex;gap:6px;margin:0 0 11px}
 .stkFB .sg{display:flex;background:var(--surf);border:1px solid var(--bd);border-radius:9px;padding:2px;gap:2px;flex:1;min-width:0}
 .stkFB button{flex:1;min-width:0;background:none;border:0;color:var(--tx3);font-size:11px;font-weight:700;padding:6px 2px;border-radius:7px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -407,7 +411,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
         <button class="iBtn" id="btnAcc" aria-label="Compte"><span style="width:16px;height:16px;display:block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;display:block"><circle cx="12" cy="12" r="10"/> <circle cx="12" cy="10" r="3"/> <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span></button>
       </div>
     </div>
-    <div class="srch">
+    <div class="srch" id="srch">
       <span class="ic" style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;display:block"><path d="m21 21-4.34-4.34"/> <circle cx="11" cy="11" r="8"/></svg></span>
       <input type="search" id="q" placeholder="Nom, Pokémon, boîte…" autocomplete="off">
       <button class="clr hide" id="qClr">×</button>
@@ -454,7 +458,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.57d';
+var APP_VERSION = '2.58d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -1021,6 +1025,7 @@ function render(){
   $('s4').textContent = eur0(rev);
   setBadge('nb2', afaire);
   $('stats').classList.toggle('hide', tab !== 'vitrine' && tab !== 'histo');
+  $('srch').classList.toggle('hide', tab === 'stock' && !!stkSet);
   $('qClr').classList.toggle('hide', !query());
 
   if(selMode) updateSelBar();
@@ -2155,7 +2160,7 @@ for(var n=0;n<navs.length;n++){
     this.classList.add('on');
     tab = this.getAttribute('data-t');
     boxFilter = null;
-    if(tab !== 'stock' && stkSet){ stkSet = null; if(history.state && history.state.d === 3) history.back(); }
+    if(tab !== 'stock' && stkSet){ stkSet = null; stkQry = ''; if(history.state && history.state.d === 3) history.back(); }
     $('fab').classList.toggle('hide', tab !== 'vitrine' && tab !== 'afaire');
     $('q').value = '';
     window.scrollTo(0,0);
@@ -2186,7 +2191,7 @@ window.addEventListener('popstate', function(){
   if(sheetOpen){ closeSheet(); history.pushState({d:1},''); return; }
   if(query()){ $('q').value = ''; render(); history.pushState({d:1},''); return; }
   if(history.state && history.state.d === 3) return;           /* retour sur la grille depuis un panneau */
-  if(tab === 'stock' && stkSet){ stkSet = null; window.scrollTo(0,0); render(); return; }
+  if(tab === 'stock' && stkSet){ stkSet = null; stkQry = ''; window.scrollTo(0,0); render(); return; }
 });
 var _open = openSheet;
 openSheet = function(h){ _open(h); history.pushState({ d:1 }, ''); };
@@ -2256,6 +2261,7 @@ var stock = {}, stkOv = {}, stkMoves = [], stkRev = 0;
 var stkFileId = null, stkBaseRev = 0, stkPending = [];
 var stkTimer = null, stkSaving = false, stkLoaded = false;
 var stkSet = null, stkLp = null, stkLpFired = false;
+var stkArr = [], stkQry = '';
 var stkFilt = localStorage.getItem(LS + 'filt') || 'all';   /* all | has | none */
 var stkTri  = localStorage.getItem(LS + 'tri')  || 'num';   /* num | qty */
 
@@ -2480,9 +2486,9 @@ async function renderStock(){
     try{ await cdbLoad(); }catch(e){ $('view').innerHTML = empty(EMPTY_CMD, 'Liste des extensions indisponible.'); return; }
   }
   if(!stkLoaded) await stkLoad();
+  if(stkSet) return stkRenderGrid();      /* la recherche se fait dans l'extension */
   var q = query();
   if(q) return stkRenderSearch(q);
-  if(stkSet) return stkRenderGrid();
   stkRenderSets();
 }
 
@@ -2557,15 +2563,7 @@ async function stkRenderGrid(){
   var tot = 0, poss = 0;
   for(var j=0;j<arr.length;j++){ var q = stkCardQ(arr[j].i); tot += q; if(q) poss++; }
 
-  var vue = arr;
-  if(stkFilt === 'has')  vue = arr.filter(function(c){ return stkCardQ(c.i) > 0; });
-  if(stkFilt === 'none') vue = arr.filter(function(c){ return stkCardQ(c.i) === 0; });
-  if(stkTri === 'qty'){
-    vue = vue.slice().sort(function(a, b){
-      var d2 = stkCardQ(b.i) - stkCardQ(a.i);
-      return d2 || (arr.indexOf(a) - arr.indexOf(b));
-    });
-  }
+  stkArr = arr;
 
   function seg(attr, val, cur, lbl){
     return '<button class="' + (cur === val ? 'on' : '') + '" data-' + attr + '="' + val + '">' + lbl + '</button>';
@@ -2576,17 +2574,73 @@ async function stkRenderGrid(){
     seg('stkt','num',stkTri,'N°') + seg('stkt','qty',stkTri,'Quantité') +
     '</div></div>';
 
+  var srch = '<div class="stkSrch"><input type="search" id="stkq" placeholder="Chercher dans cette extension…"' + noAuto() + ' value="' + esc(stkQry) + '">' +
+             (stkQry ? '<button class="sx" id="stkqx" aria-label="Effacer">×</button>' : '') + '</div>';
+
   var sub = arr.length + ' cartes · ' + poss + ' possédées · ' + tot + ' en stock';
-  var h = head(sub) + bar;
+  $('view').innerHTML = head(sub) + srch + bar + '<div id="stkgrid"></div>';
+  stkGridFill();
+
+  var inp = $('stkq');
+  if(inp){
+    inp.oninput = function(){
+      clearTimeout(inp._t);
+      inp._t = setTimeout(function(){
+        stkQry = inp.value;
+        stkGridFill();
+        var x = $('stkqx');
+        if(stkQry && !x){
+          var b = document.createElement('button');
+          b.className = 'sx'; b.id = 'stkqx'; b.textContent = '×';
+          b.onclick = stkClearQ;
+          inp.parentNode.appendChild(b);
+        } else if(!stkQry && x) x.remove();
+      }, 200);
+    };
+  }
+  if($('stkqx')) $('stkqx').onclick = stkClearQ;
+}
+
+function stkClearQ(){
+  stkQry = '';
+  var i = $('stkq');
+  if(i) i.value = '';
+  var x = $('stkqx');
+  if(x) x.remove();
+  stkGridFill();
+  if(i) i.focus();
+}
+
+/* recalcule uniquement la grille : le champ de recherche garde le focus */
+function stkGridFill(){
+  var g = $('stkgrid');
+  if(!g) return;
+  var vue = stkArr;
+  if(stkFilt === 'has')  vue = vue.filter(function(c){ return stkCardQ(c.i) > 0; });
+  if(stkFilt === 'none') vue = vue.filter(function(c){ return stkCardQ(c.i) === 0; });
+
+  var q = norm(stkQry || '');
+  if(q){
+    vue = vue.filter(function(c){
+      return norm(c.n).indexOf(q) >= 0 || norm(c.e).indexOf(q) >= 0 ||
+             String(c.u).toLowerCase().indexOf(stkQry.trim().toLowerCase()) === 0;
+    });
+  }
+  if(stkTri === 'qty'){
+    vue = vue.slice().sort(function(a, b){
+      return (stkCardQ(b.i) - stkCardQ(a.i)) || (stkArr.indexOf(a) - stkArr.indexOf(b));
+    });
+  }
   if(!vue.length){
-    h += '<div class="pkE">' + (stkFilt === 'has' ? 'Aucune carte saisie dans cette extension.'
-                                                  : 'Tu as toutes les cartes de cette extension.') + '</div>';
-    $('view').innerHTML = h;
+    g.innerHTML = '<div class="pkE">' +
+      (q ? 'Aucune carte ne correspond dans cette extension.'
+         : (stkFilt === 'has' ? 'Aucune carte saisie dans cette extension.'
+                              : 'Tu as toutes les cartes de cette extension.')) + '</div>';
     return;
   }
-  h += '<div class="stkGrid">';
+  var h = '<div class="stkGrid">';
   for(var k=0;k<vue.length;k++) h += stkTile(vue[k]);
-  $('view').innerHTML = h + '</div>';
+  g.innerHTML = h + '</div>';
 }
 
 async function stkRenderSearch(q){
@@ -2721,18 +2775,23 @@ function stkBind(){
     }
     if((t = e.target.closest('[data-stkset]'))){
       stkSet = t.getAttribute('data-stkset');
+      stkQry = '';
       history.pushState({ d:3 }, '');
       window.scrollTo(0,0); render(); return;
     }
     if((t = e.target.closest('[data-stkf]'))){
       stkFilt = t.getAttribute('data-stkf');
       localStorage.setItem(LS + 'filt', stkFilt);
-      window.scrollTo(0,0); render(); return;
+      var g1 = t.closest('.stkFB');
+      if(g1){ var bs = g1.querySelectorAll('[data-stkf]'); for(var z=0;z<bs.length;z++) bs[z].classList.toggle('on', bs[z].getAttribute('data-stkf') === stkFilt); }
+      stkGridFill(); return;
     }
     if((t = e.target.closest('[data-stkt]'))){
       stkTri = t.getAttribute('data-stkt');
       localStorage.setItem(LS + 'tri', stkTri);
-      window.scrollTo(0,0); render(); return;
+      var g2 = t.closest('.stkFB');
+      if(g2){ var bt = g2.querySelectorAll('[data-stkt]'); for(var z2=0;z2<bt.length;z2++) bt[z2].classList.toggle('on', bt[z2].getAttribute('data-stkt') === stkTri); }
+      stkGridFill(); return;
     }
     if((t = e.target.closest('[data-stkv]'))){
       if(stkLpFired){ stkLpFired = false; return; }
