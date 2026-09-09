@@ -368,13 +368,18 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .shE button{width:31px;height:31px;border-radius:8px;border:1px solid var(--bd);background:#0c1428;color:var(--tx);font-size:16px;font-weight:800;cursor:pointer;flex:none;line-height:1}
 .shE .qv{width:30px;text-align:center;font-size:15px;font-weight:900;flex:none}
 .stkWarn{background:rgba(210,153,34,.11);border:1px solid rgba(210,153,34,.34);color:#d29922;border-radius:9px;padding:8px 11px;font-size:11px;font-weight:600;margin-bottom:11px;line-height:1.4}
+.stkJB{display:flex;align-items:center;gap:8px;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:10px 13px;margin-bottom:10px;cursor:pointer;font-size:13px;font-weight:700}
+.stkJB svg{width:17px;height:17px;flex:none;color:var(--tx3)}
+.stkJB .jc{margin-left:auto;color:var(--tx3);font-weight:700;font-size:12px}
+.stkJD{color:var(--tx3);font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin:15px 0 4px}
 .stkMv{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12px}
 .stkMv .d{font-weight:900;flex:none;width:32px;text-align:center;border-radius:6px;padding:2px 0}
 .stkMv .d.p{color:#3fb950;background:rgba(63,185,80,.12)}
 .stkMv .d.m{color:#f85149;background:rgba(248,81,73,.12)}
 .stkMv .mt{flex:1;min-width:0}
 .stkMv .mt b{display:block;font-weight:700}
-.stkMv .mt small{color:var(--tx3);font-size:10px}
+.stkMv .mt small{display:block;color:var(--tx3);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stkMv .mh{color:var(--tx3);font-size:10px;font-weight:700;flex:none}
 
 /* selection de cartes pour un lot */
 .pkH{font-size:11px;font-weight:800;color:var(--tx3);letter-spacing:.5px;text-transform:uppercase;margin:14px 0 7px}
@@ -458,7 +463,7 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.58d';
+var APP_VERSION = '2.59d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 var PREFIX = 'dvp_';
@@ -1025,7 +1030,7 @@ function render(){
   $('s4').textContent = eur0(rev);
   setBadge('nb2', afaire);
   $('stats').classList.toggle('hide', tab !== 'vitrine' && tab !== 'histo');
-  $('srch').classList.toggle('hide', tab === 'stock' && !!stkSet);
+  $('srch').classList.toggle('hide', tab === 'stock' && (!!stkSet || stkJournal));
   $('qClr').classList.toggle('hide', !query());
 
   if(selMode) updateSelBar();
@@ -2160,6 +2165,7 @@ for(var n=0;n<navs.length;n++){
     this.classList.add('on');
     tab = this.getAttribute('data-t');
     boxFilter = null;
+    if(tab !== 'stock') stkJournal = false;
     if(tab !== 'stock' && stkSet){ stkSet = null; stkQry = ''; if(history.state && history.state.d === 3) history.back(); }
     $('fab').classList.toggle('hide', tab !== 'vitrine' && tab !== 'afaire');
     $('q').value = '';
@@ -2191,6 +2197,7 @@ window.addEventListener('popstate', function(){
   if(sheetOpen){ closeSheet(); history.pushState({d:1},''); return; }
   if(query()){ $('q').value = ''; render(); history.pushState({d:1},''); return; }
   if(history.state && history.state.d === 3) return;           /* retour sur la grille depuis un panneau */
+  if(tab === 'stock' && stkJournal){ stkJournal = false; window.scrollTo(0,0); render(); return; }
   if(tab === 'stock' && stkSet){ stkSet = null; stkQry = ''; window.scrollTo(0,0); render(); return; }
 });
 var _open = openSheet;
@@ -2261,7 +2268,7 @@ var stock = {}, stkOv = {}, stkMoves = [], stkRev = 0;
 var stkFileId = null, stkBaseRev = 0, stkPending = [];
 var stkTimer = null, stkSaving = false, stkLoaded = false;
 var stkSet = null, stkLp = null, stkLpFired = false;
-var stkArr = [], stkQry = '';
+var stkArr = [], stkQry = '', stkJournal = false;
 var stkFilt = localStorage.getItem(LS + 'filt') || 'all';   /* all | has | none */
 var stkTri  = localStorage.getItem(LS + 'tri')  || 'num';   /* num | qty */
 
@@ -2486,6 +2493,7 @@ async function renderStock(){
     try{ await cdbLoad(); }catch(e){ $('view').innerHTML = empty(EMPTY_CMD, 'Liste des extensions indisponible.'); return; }
   }
   if(!stkLoaded) await stkLoad();
+  if(stkJournal) return stkRenderJournal();
   if(stkSet) return stkRenderGrid();      /* la recherche se fait dans l'extension */
   var q = query();
   if(q) return stkRenderSearch(q);
@@ -2503,6 +2511,10 @@ function stkRenderSets(){
   }
   var h = '<div class="stkTot"><div><span>Cartes en stock</span><b>' + tot + '</b></div>' +
           '<div><span>Lignes</span><b>' + uniq + '</b></div></div>';
+  h += '<div class="stkJB" data-stkj="1">' +
+       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+       '<path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>' +
+       'Journal des mouvements<span class="jc">' + stkMoves.length + '</span></div>';
   /* reporter le stock des sous-extensions sur leur parent */
   for(var sk in per){
     var rt = rootSet(sk);
@@ -2720,6 +2732,54 @@ async function stkRenderSearch(q){
   $('view').innerHTML = h;
 }
 
+/* ---- journal des mouvements ---- */
+var SRC_LBL = { saisie:'Saisie', lot:'Mis en lot', retour:'Retour de lot', variante:'Variante' };
+
+async function stkRenderJournal(){
+  var ico = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
+  function head(sub){
+    return '<div class="stkBar"><button class="stkBack" data-stkjb="1" aria-label="Retour">' + ico + '</button>' +
+           '<div class="stkTit">Journal des mouvements<small>' + sub + '</small></div></div>';
+  }
+  if(!stkMoves.length){
+    $('view').innerHTML = head('aucun mouvement') + '<div class="pkE">Rien n\'a encore été saisi.</div>';
+    return;
+  }
+
+  var LIM = 300;
+  var list = stkMoves.slice(-LIM).reverse();
+  var keys = list.map(function(m){ return m.c; });
+  $('view').innerHTML = head('chargement…');
+  await ensureCards(keys);
+  if(!stkJournal || tab !== 'stock') return;
+
+  var sub = stkMoves.length + ' mouvement' + (stkMoves.length > 1 ? 's' : '');
+  if(stkMoves.length > LIM) sub += ' · ' + LIM + ' derniers affichés';
+  var h = head(sub), jour = null;
+
+  for(var i=0;i<list.length;i++){
+    var m = list[i], c = cdbById[m.c];
+    var d = new Date(m.t), j = dt(m.t);
+    if(j !== jour){ jour = j; h += '<div class="stkJD">' + esc(j) + '</div>'; }
+
+    var vs = c ? stkVars(c) : [];
+    var det = [];
+    if(vs.length > 1 && VAR_FULL[m.v]) det.push(VAR_FULL[m.v]);
+    if(m.e && m.e !== 'nm') det.push(ET_LBL[m.e] || m.e);
+    var si = c ? setInfo(rootSet(c.s)) : null;
+    if(si) det.push(si.name);
+    if(m.s && SRC_LBL[m.s]) det.push(SRC_LBL[m.s]);
+
+    var hh = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    h += '<div class="stkMv">' +
+         '<span class="d ' + (m.d > 0 ? 'p' : 'm') + '">' + (m.d > 0 ? '+' : '') + m.d + '</span>' +
+         '<span class="mt"><b>' + esc(c ? c.n : m.c) + (c ? ' <span style="color:var(--tx3);font-weight:600">n° ' + esc(c.u) + '</span>' : '') + '</b>' +
+         '<small>' + esc(det.join(' · ')) + '</small></span>' +
+         '<span class="mh">' + hh + (m.w ? ' · ' + esc(m.w) : '') + '</span></div>';
+  }
+  $('view').innerHTML = h;
+}
+
 /* ---- panneau détail carte ---- */
 function sheetStkCard(id){
   var c = cdbById[id];
@@ -2775,9 +2835,18 @@ function stkBind(){
     }
     if((t = e.target.closest('[data-stkset]'))){
       stkSet = t.getAttribute('data-stkset');
-      stkQry = '';
+      stkQry = ''; stkJournal = false;
       history.pushState({ d:3 }, '');
       window.scrollTo(0,0); render(); return;
+    }
+    if((t = e.target.closest('[data-stkj]'))){
+      stkJournal = true; history.pushState({ d:3 }, '');
+      window.scrollTo(0,0); render(); return;
+    }
+    if((t = e.target.closest('[data-stkjb]'))){
+      if(history.state && history.state.d === 3){ history.back(); }
+      else { stkJournal = false; window.scrollTo(0,0); render(); }
+      return;
     }
     if((t = e.target.closest('[data-stkf]'))){
       stkFilt = t.getAttribute('data-stkf');
