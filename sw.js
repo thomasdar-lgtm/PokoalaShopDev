@@ -1,11 +1,11 @@
-const CACHE_VERSION = '2.75d';
-const CACHE_NAME = 'pokoalashopdev-v' + CACHE_VERSION;
+const CACHE_VERSION = '3.13';
+const CACHE_NAME = 'pokoalashop-v' + CACHE_VERSION;
 /* cache non versionne : la base de cartes est versionnee par son URL (?v=N),
    inutile de re-telecharger 2,7 Mo a chaque montee de version */
-const CACHE_DATA = 'pokoalashopdev-data';
+const CACHE_DATA = 'pokoalashop-data';
 /* cache images non versionne : les visuels de cartes et les symboles d'extension
    ne changent jamais, inutile de les retelecharger a chaque montee de version */
-const CACHE_IMG = 'pokoalashopdev-img';
+const CACHE_IMG = 'pokoalashop-img';
 const IMAGE_HOSTS = ['assets.tcgdex.net', 'images.pokemontcg.io', 'images.scrydex.com', 'archives.bulbagarden.net'];
 const ASSETS = ['./', './index.html', './manifest.json', './icons/logo.png', './icons/icon-192.png', './icons/icon-512.png'];
 

@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#00071a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="PKS Dev">
+<meta name="apple-mobile-web-app-title" content="PoKoalaShop">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>PoKoalaShop DEV</title>
+<title>PoKoalaShop</title>
 <style>
 :root{
 --bg:#00071a;--surf:#0b1430;--surf2:#152045;--surf3:#202c58;
@@ -294,7 +294,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
   #view{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
 }
 .tagBox{background:var(--surf2);border-radius:var(--r2);padding:11px 12px;font-size:12px;color:var(--tx2);line-height:1.55;margin:0 18px 12px;word-break:break-word;max-height:130px;overflow-y:auto}
-body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:#E3350D;z-index:9999;pointer-events:none}
+
 /* ===== MODULE STOCK ===== */
 .stkBar{display:flex;align-items:center;gap:10px;margin:0 0 11px;padding:2px 0}
 .stkBack{background:var(--surf);border:1px solid var(--bd);color:var(--tx);border-radius:11px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0}
@@ -491,13 +491,13 @@ body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;backgroun
 
 <script>
 'use strict';
-var APP_VERSION = '2.75d';
+var APP_VERSION = '3.13';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
-var PREFIX = 'dvp_';
-var LS = 'dvl_';
+var PREFIX = 'pks_';
+var LS = 'pks_';
 var POLL_MS = 12000;
-var BAK_PREFIX = 'dvb_';
+var BAK_PREFIX = 'bak_';
 var BAK_KEEP = 10;
 var BAK_EVERY = 6 * 3600 * 1000;
 var REFRESH_MARGIN = 5 * 60 * 1000;
@@ -588,7 +588,7 @@ function closeCfm(){ $('cfm').classList.remove('on'); cfmCb = null; }
 var idb = null;
 function openIdb(){
   return new Promise(function(res){
-    var r = indexedDB.open('pokoalashopdev', 1);
+    var r = indexedDB.open('pokoalashop', 1);
     r.onupgradeneeded = function(e){
       var db = e.target.result;
       if(!db.objectStoreNames.contains('ph')) db.createObjectStore('ph');
@@ -2172,6 +2172,10 @@ for(var n=0;n<navs.length;n++){
     $('fab').classList.toggle('hide', tab !== 'vitrine' && tab !== 'afaire');
     $('q').value = '';
     window.scrollTo(0,0);
+    /* vider la zone avant de rendre : les autres onglets se dessinent
+       instantanement, mais le Stock attend ses donnees et laisserait
+       sinon le contenu de l'onglet precedent a l'ecran */
+    $('view').innerHTML = '';
     render();
   };
 }
@@ -2258,8 +2262,8 @@ window.addEventListener('load', function(){
 });
 
 /* ===================== MODULE STOCK ===================== */
-var STK_FILE = 'dvstk.json';
-var MV_FILE  = 'dvstkmv.json';   /* journal a part : il grossit sans fin, le stock non */
+var STK_FILE = 'pkstk.json';
+var MV_FILE  = 'pkstkmv.json';   /* journal a part : il grossit sans fin, le stock non */
 var MV_CAP   = 4000;             /* mouvements conserves */
 var CARDS_VER = '5';   /* fichiers cards/ et pks_names.json */
 var SETS_VER  = '6';   /* pks_sets.json seul, pour ne pas invalider les cartes deja en cache */
