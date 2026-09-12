@@ -2,17 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#00071a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="PoKoalaShop">
+<meta name="apple-mobile-web-app-title" content="PKS Dev">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>PoKoalaShop</title>
+<title>PoKoalaShop DEV</title>
 <style>
 :root{
 --bg:#00071a;--surf:#0b1430;--surf2:#152045;--surf3:#202c58;
@@ -66,8 +66,8 @@ header{position:sticky;top:0;z-index:60;background:var(--bg);padding:calc(10px +
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding-bottom:10px}
 .st{background:var(--surf);border-radius:10px;padding:7px 4px;text-align:center}
 .stV{font-size:17px;font-weight:800;line-height:1.1}
-.stL{font-size:9.5px;color:var(--tx2);margin-top:2px}
-.st.a .stV{color:var(--red)}.st.b .stV{color:var(--yel)}.st.c .stV{color:var(--blu)}.st.d .stV{color:var(--grn);font-size:14px}
+.stL{font-size:9.5px;color:var(--tx2);margin-bottom:3px;font-weight:600;letter-spacing:.2px}
+.st.a .stV{color:var(--grn)}.st.b .stV{color:var(--yel)}.st.c .stV{color:var(--blu)}.st.d .stV{color:var(--grn)}
 
 /* CONTENT */
 main{padding:4px 16px 20px}
@@ -294,9 +294,17 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
   #view{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
 }
 .tagBox{background:var(--surf2);border-radius:var(--r2);padding:11px 12px;font-size:12px;color:var(--tx2);line-height:1.55;margin:0 18px 12px;word-break:break-word;max-height:130px;overflow-y:auto}
-
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:#E3350D;z-index:9999;pointer-events:none}
 /* ===== MODULE STOCK ===== */
-.stkBar{display:flex;align-items:center;gap:10px;margin:0 0 11px;padding:2px 0}
+/* bandeau d'extension collant sous l'en-tete de l'app.
+   --hdrH est mesure en JS : la hauteur de l'en-tete varie selon que la barre
+   de recherche globale est affichee ou non. */
+/* La marge haute negative annule le retrait de <main> (4px) et le pixel de
+   chevauchement : au repos le bandeau occupe deja sa position de blocage,
+   il ne parcourt donc aucune distance avant de se figer. Le retrait interne
+   compense pour conserver l'espacement visuel. */
+.stkBar{display:flex;align-items:center;gap:10px;margin:-5px -16px 11px;padding:13px 16px 8px;position:sticky;top:calc(var(--hdrH,54px) - 1px);z-index:50;background:var(--bg);box-shadow:0 -3px 0 0 var(--bg)}
+.stkBar::after{content:'';position:absolute;left:16px;right:16px;bottom:0;height:1px;background:var(--bd);opacity:.55}
 .stkBack{background:var(--surf);border:1px solid var(--bd);color:var(--tx);border-radius:11px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0}
 .stkBack svg{width:22px;height:22px;display:block}
 .stkBack:active{background:#0c1428}
@@ -313,16 +321,21 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .stkTit .th .ssym,.stkTit .th .sfb{width:24px;height:24px}
 .stkSet .sc{font-size:12px;font-weight:800;color:var(--blu);flex:none}
 .stkSet .sc.z{color:var(--tx3);font-weight:600}
-.stkSerie{color:var(--tx3);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin:15px 0 7px}
+/* en-tete de bloc : volontairement different des lignes d'extension,
+   sinon les deux se confondent */
+.stkSerie{position:relative;display:flex;align-items:center;color:var(--tx);font-size:17px;font-weight:900;letter-spacing:-.2px;text-transform:none;margin:24px 0 11px;padding:0 0 9px 13px;background:none;border:0;border-bottom:2px solid var(--bd)}
+.stkSerie::before{content:'';position:absolute;left:0;top:1px;bottom:11px;width:4px;border-radius:3px;background:var(--blu)}
+.stkSerie:first-child{margin-top:4px}
 .stkSrch{position:relative;margin:0 0 10px}
 .stkSrch input{width:100%;background:var(--surf);border:1px solid var(--bd);border-radius:11px;padding:10px 34px 10px 13px;color:var(--tx);font-size:14px;outline:none}
 .stkSrch input::-webkit-search-cancel-button,.stkSrch input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
 .stkSrch .sx{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--surf2);border:0;color:var(--tx2);width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer}
+.stkWrap{display:block}
 .stkFB{display:flex;gap:6px;margin:0 0 11px}
 .stkFB .sg{display:flex;background:var(--surf);border:1px solid var(--bd);border-radius:9px;padding:2px;gap:2px;flex:1;min-width:0}
 .stkFB button{flex:1;min-width:0;background:none;border:0;color:var(--tx3);font-size:11px;font-weight:700;padding:6px 2px;border-radius:7px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stkFB button.on{background:var(--surf2);color:var(--tx)}
-.stkGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stkGrid{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:9px}
 .stkC{background:var(--surf);border:1px solid var(--bd);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
 .stkC.has{border-color:var(--blu)}
 .stkC .im{position:relative;background:#0c1428;aspect-ratio:245/342}
@@ -387,6 +400,13 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .nvOk:active{color:var(--grn);border-color:rgba(63,185,80,.5)}
 .nvRow.fait{opacity:.55}
 .nvRow.fait .nvOk{color:var(--grn)}
+.gAcc{display:flex;align-items:center;gap:10px;background:var(--surf2);border:1px solid var(--bd);border-radius:10px;padding:11px 13px}
+.gAcc .gDot{width:9px;height:9px;border-radius:50%;flex:none}
+.gAcc.ok .gDot{background:#3fb950;box-shadow:0 0 0 3px rgba(63,185,80,.18)}
+.gAcc.ko .gDot{background:#f85149;box-shadow:0 0 0 3px rgba(248,81,73,.18)}
+.gAcc .gTx{min-width:0}
+.gAcc .gTx b{display:block;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gAcc .gTx small{display:block;color:var(--tx3);font-size:11px;margin-top:2px}
 .majBar{position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:9998;display:flex;align-items:center;gap:10px;background:var(--surf2);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;box-shadow:0 8px 26px rgba(0,0,0,.45);font-size:13px;font-weight:600}
 .majBar b{font-weight:800}
 .majBar .mj{margin-left:auto;flex:none;background:var(--blu);border:0;color:#fff;border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:800;cursor:pointer}
@@ -427,7 +447,96 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .pkB:disabled{opacity:.3;cursor:default}
 .pkQ{min-width:20px;text-align:center;font-size:15px;font-weight:900}
 .lotCB{background:rgba(56,139,253,.16);color:var(--blu);font-weight:800;border-radius:5px;padding:1px 5px;font-size:10px;margin-left:5px}
+
+/* ─── module Stock sur grand ecran ───
+   Place en fin de feuille, apres les regles de base du module : a specificite
+   egale c'est la derniere qui s'applique. */
+@media (min-width:760px){
+  #view>.stkWrap{grid-column:1/-1;display:block}
+  .stkGrid{grid-template-columns:repeat(var(--cols,6),1fr);gap:12px}
+  .stkC .na{font-size:11.5px;height:32px;padding:5px 6px}
+  .stkC .nu{font-size:15px;padding:3px 8px}
+  .stkC .vs{gap:5px;padding:0 6px 7px}
+  .stkC .vs .stkV{padding:9px 0 8px}
+  .stkC .vs .stkV .vq{font-size:15px}
+  .stkC .vs .stkV.solo{padding:13px 0 12px}
+  .stkC .rar{width:22px;height:22px;bottom:5px;left:5px}
+  .stkC .rar svg{width:13px;height:13px}
+  .stkC .cmk{width:26px;height:26px;bottom:4px;right:4px}
+  .stkC .cmk img{width:19px;height:19px}
+  .stkSets{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:8px}
+  .stkSets>.stkSerie{grid-column:1/-1}
+  .stkSet{margin-bottom:0}
+  .stkRows{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:8px}
+  .stkRows>.stkSerie{grid-column:1/-1}
+  .stkRow,.nvRow{margin-bottom:0}
+  .stkTot b{font-size:22px}
+  .stkTit{font-size:19px}
+  .stkTit small{font-size:12.5px}
+  .stkSrch input{font-size:15px;padding:12px 36px 12px 14px}
+  .stkFB button{font-size:12.5px;padding:8px 4px}
+}
+@media (min-width:1180px){
+  .stkGrid{grid-template-columns:repeat(var(--cols,7),1fr)}
+}
+
+/* ─── bandeau superieur sur grand ecran ─── */
+@media (min-width:760px){
+  header{padding:calc(16px + env(safe-area-inset-top)) 26px 2px}
+  .brand{gap:12px}
+  .brand img{width:52px}
+  .wm{font-size:27px}
+  .srch{margin-top:4px}
+}
+@media (min-width:1180px){
+  header{padding-left:30px;padding-right:30px}
+  .brand img{width:56px}
+  .wm{font-size:29px}
+}
+
+/* vignettes resserrees quand l'utilisateur demande beaucoup de colonnes */
+.stkGrid.dense .na{font-size:9px;height:23px;padding:3px 4px}
+.stkGrid.dense .nu{font-size:11px;padding:1px 5px}
+.stkGrid.dense .vs{gap:3px;padding:0 3px 4px}
+.stkGrid.dense .stkV{padding:5px 0 4px}
+.stkGrid.dense .stkV .vl{font-size:7px}
+.stkGrid.dense .stkV .vq{font-size:11px}
+.stkGrid.dense .stkV.solo{padding:7px 0 6px}
+.stkGrid.dense .rar{width:15px;height:15px;bottom:3px;left:3px}
+.stkGrid.dense .rar svg{width:9px;height:9px}
+.stkGrid.dense .cmk{width:17px;height:17px}
+.stkGrid.dense .cmk img{width:12px;height:12px}
+.stkFB .sg.cols{flex:0 0 auto}
+.stkFB .sg.cols button{min-width:30px;padding:6px 5px}
+
+@media (min-width:760px){
+  .stkBar{margin:-7px -22px 11px;padding:15px 22px 8px}
+  .stkBar::after{left:22px;right:22px}
+}
+
+/* Session connue : ne jamais peindre l'ecran de connexion. La classe est posee
+   avant le rendu par le petit script du <head>, ce qui evite le sursaut du logo
+   entre l'ecran de demarrage d'Android et celui de l'app. */
+html.sess #auth{display:none!important}
+html.sess #app{display:block!important}
+
+@media (min-width:760px){
+  .stkSerie{font-size:20px;padding:0 0 11px 16px;margin:28px 0 13px}
+  .stkSerie::before{width:5px;bottom:13px}
+}
+
+/* Chrome Android ignore maximum-scale seul : il faut aussi neutraliser le
+   geste de pincement au niveau du document. */
+html{touch-action:pan-x pan-y}
 </style>
+<script>
+/* execute avant tout rendu : si un jeton valide ou une identite est
+   enregistre, on masque l'ecran de connexion des le depart */
+(function(){try{var s=JSON.parse(localStorage.getItem('dvl_tk')||'null');
+var ok=!!(s&&s.t&&s.e>Date.now()+60000);
+if(!ok){var w=localStorage.getItem('dvl_who');ok=(w==='thomas'||w==='cindy');}
+if(ok)document.documentElement.className+=' sess';}catch(e){}})();
+</script>
 </head>
 <body>
 
@@ -450,13 +559,13 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     </div>
     <div class="srch" id="srch">
       <span class="ic" style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;display:block"><path d="m21 21-4.34-4.34"/> <circle cx="11" cy="11" r="8"/></svg></span>
-      <input type="search" id="q" placeholder="Nom, Pokémon, boîte…" autocomplete="off">
+      <input type="search" id="q" placeholder="Recherche" autocomplete="off">
       <button class="clr hide" id="qClr">×</button>
     </div>
     <div class="stats" id="stats">
-      <div class="st a"><div class="stV" id="s1">0</div><div class="stL">Vitrine</div></div>
-      <div class="st b"><div class="stV" id="s2">0</div><div class="stL">À faire</div></div>
-      <div class="st d"><div class="stV" id="s4">0€</div><div class="stL">Revenus</div></div>
+      <div class="st a"><div class="stL">Vitrine</div><div class="stV" id="s1">0</div></div>
+      <div class="st b"><div class="stL">À faire</div><div class="stV" id="s2">0</div></div>
+      <div class="st d"><div class="stL">Revenus</div><div class="stV" id="s4">0€</div></div>
     </div>
   </header>
 
@@ -495,16 +604,17 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 
 <script>
 'use strict';
-var APP_VERSION = '3.15';
+var APP_VERSION = '3.14d';
 var CLIENT_ID = '794515583920-a9togbole8fr9njjsrjt0f1cq6utaent.apps.googleusercontent.com';
 var SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
-var PREFIX = 'pks_';
-var LS = 'pks_';
-var POLL_MS = 12000;
-var BAK_PREFIX = 'bak_';
+var PREFIX = 'dvp_';
+var LS = 'dvl_';
+var POLL_MS = 45000;   /* lots : rien ne change assez vite pour interroger plus souvent */
+var BAK_PREFIX = 'dvb_';
 var BAK_KEEP = 10;
 var BAK_EVERY = 6 * 3600 * 1000;
-var REFRESH_MARGIN = 5 * 60 * 1000;
+var REFRESH_MARGIN = 15 * 60 * 1000;   /* on renouvelle bien avant l'echeance */
+var TOKEN_SEUIL = 20 * 60 * 1000;      /* en dessous, on retente en continu */
 
 var ST = { afaire:'À préparer', pret:'Préparé', vitrine:'En vitrine', vendu:'Vendu', expedie:'Expédié' };
 
@@ -525,6 +635,7 @@ var WHOS = { thomas:'Thomas', cindy:'Cindy' };
    fonctionnement a deux comptes. */
 var SOLO = 'cindy';
 var dirty = false, saving = false, pollTimer = null, sheetOpen = false;
+var majTimer = null, majInt = null, syncInt = null, tokInt = null, visBound = false;
 var refreshTimer = null, booted = false, offline = false;
 var cfmCb = null;
 var tagTpl = '#pokemon #cartepokemon #lotpokemon #{poke} #carte{poke} #pokemontcg #collectionpokemon #cartesapokemon #dracaufeu #pikachu #evoli #boosterpokemon #lotcartes';
@@ -592,7 +703,7 @@ function closeCfm(){ $('cfm').classList.remove('on'); cfmCb = null; }
 var idb = null;
 function openIdb(){
   return new Promise(function(res){
-    var r = indexedDB.open('pokoalashop', 1);
+    var r = indexedDB.open('pokoalashopdev', 1);
     r.onupgradeneeded = function(e){
       var db = e.target.result;
       if(!db.objectStoreNames.contains('ph')) db.createObjectStore('ph');
@@ -641,31 +752,56 @@ function initGis(){
       try{ localStorage.setItem(LS + 'tk', JSON.stringify({ t: token, e: tokenExp })); }catch(e){}
       offline = false;
       scheduleRefresh();
+      fetchMe();
       if(booted){ setSync('busy'); sync(false); }
       else start();
     }
   });
 }
+/* Compte Google rattache. Recupere a chaque obtention de jeton : au demarrage
+   seul, l'information manquait des que l'authentification arrivait plus tard. */
+function fetchMe(){
+  if(!tokenValid()) return;
+  api('https://www.googleapis.com/oauth2/v3/userinfo')
+    .then(function(r){ return r.json(); })
+    .then(function(u){ me = u; })
+    .catch(function(){});
+}
+
 function signIn(){ tokenClient.requestAccessToken({ prompt: '' }); }
 
 var reauthAt = 0;
 function reauth(){
   if(Date.now() - reauthAt < 4000) return;
   reauthAt = Date.now();
-  try{ tokenClient.requestAccessToken({ prompt: '' }); }catch(e){ offline = true; setSync('err'); }
+  /* 'hint' indique a Google quel compte renouveler : sans lui, il affiche
+     souvent le selecteur de compte au lieu de rendre la main en silence. */
+  var o = { prompt: '' };
+  if(me && me.email) o.hint = me.email;
+  try{ tokenClient.requestAccessToken(o); }catch(e){ offline = true; setSync('err'); }
 }
+
+function tokenLeft(){ return tokenExp - Date.now(); }
 
 function scheduleRefresh(){
   clearTimeout(refreshTimer);
-  var wait = tokenExp - Date.now() - REFRESH_MARGIN;
+  var wait = tokenLeft() - REFRESH_MARGIN;
   if(wait < 30000) wait = 30000;
   refreshTimer = setTimeout(function(){
-    /* en arriere-plan on ne peut pas renouveler, mais il ne faut surtout pas
-       abandonner : sans nouvelle tentative le jeton expire et la reconnexion
-       devient visible en pleine utilisation */
+    /* en arriere-plan le renouvellement ne peut pas aboutir : on repousse
+       plutot que d'abandonner */
     if(document.hidden){ refreshTimer = setTimeout(scheduleRefresh, 45000); return; }
     reauth();
   }, wait);
+}
+
+/* Surveillance continue. Une minuterie unique ne laisse qu'une seule chance :
+   si elle est manquee — Android suspend les minuteries en arriere-plan — ou si
+   Google refuse ce renouvellement precis, le jeton expire et la reconnexion
+   devient visible. Ici on retente tant qu'il reste peu de temps. */
+function watchToken(){
+  if(document.hidden || !token) return;
+  if(tokenLeft() < TOKEN_SEUIL) reauth();
 }
 
 function tokenValid(){ return !!token && Date.now() < tokenExp - 10000; }
@@ -754,15 +890,25 @@ async function boot(){
      Quand l'utilisateur ouvre l'onglet, tout est deja pret. */
   stkPreload();
 
-  setTimeout(checkUpdate, 4000);
-  setInterval(checkUpdate, 10 * 60 * 1000);
-  document.addEventListener('visibilitychange', function(){
-    if(document.visibilityState === 'visible') checkUpdate();
-  });
+  /* toujours annuler avant d'installer : un second passage dans boot()
+     multiplierait les minuteries au lieu de les remplacer */
+  clearTimeout(majTimer);   clearInterval(majInt);
+  clearInterval(syncInt);   clearInterval(tokInt);
+  majTimer = setTimeout(checkUpdate, 4000);
+  majInt   = setInterval(checkUpdate, 30 * 60 * 1000);
+  syncInt  = setInterval(function(){ if(tab === 'stock') stkSync(); }, 30000);
+  tokInt   = setInterval(watchToken, 2 * 60 * 1000);
+  if(!visBound){
+    visBound = true;
+    document.addEventListener('visibilitychange', function(){
+      if(document.visibilityState === 'visible'){ checkUpdate(); stkSync(true); watchToken(); }
+    });
+  }
 
   if(pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(function(){
     if(sheetOpen || saving || document.hidden) return;
+    if(tab === 'stock') return;        /* cet onglet n'affiche aucun lot */
     if(tokenValid()) sync(false);
     else reauth();
   }, POLL_MS);
@@ -821,7 +967,13 @@ async function sync(full){
     offline = false;
     saveCache();
     setSync('');
-    render();
+    /* Ne pas reconstruire une vue du Stock en cours de consultation : la
+       synchronisation ne concerne que les lots, et un rafraichissement
+       complet ferait remonter le defilement en haut toutes les 12 secondes,
+       rendant la saisie impossible dans une extension. */
+    /* L'onglet Stock n'affiche aucun lot : le reconstruire a chaque
+       synchronisation rechargeait images et symboles pour rien. */
+    if(tab !== 'stock') render();
   }catch(e){
     if(e.message !== 'auth') setSync('err');
   }
@@ -1956,9 +2108,21 @@ function sheetTags(){
 }
 
 function sheetAcc(){
+  var etatOk = tokenValid() && !offline;
+  var etatLbl = etatOk ? ((me && (me.email || me.name)) || 'Connecté') : 'Non connecté';
+  var etatSub = etatOk
+    ? ((me && me.name && me.email) ? me.name : 'Sauvegarde active sur Google Drive')
+    : (offline ? 'Hors ligne — les modifications partiront au retour du réseau'
+               : 'Touche « Rafraîchir maintenant » pour rétablir la connexion');
+  if(etatOk && !me) fetchMe();
   openSheet(
     '<div class="shT">' + (SOLO ? 'PoKoalaShop' : 'Cet appareil : ' + esc(WHOS[who] || '?')) + '</div>' +
-    '<div class="shS">' + esc((me && (me.name || me.email)) || '') + ' · v' + APP_VERSION + '</div>' +
+    '<div class="shS">v' + APP_VERSION + '</div>' +
+
+    '<div class="accSec">Compte Google</div>' +
+    '<div class="fld"><div class="gAcc' + (etatOk ? ' ok' : ' ko') + '">' +
+    '<span class="gDot"></span><span class="gTx"><b>' + esc(etatLbl) + '</b>' +
+    (etatSub ? '<small>' + esc(etatSub) + '</small>' : '') + '</span></div></div>' +
 
     '<div class="accSec">Synchronisation</div>' +
     '<button class="accBtn" id="a_ref">Rafraîchir maintenant<span>' + lots.length + ' lots</span></button>' +
@@ -2174,9 +2338,16 @@ document.addEventListener('click', function(e){
 var navs = document.querySelectorAll('.nv');
 for(var n=0;n<navs.length;n++){
   navs[n].onclick = function(){
+    var cible = this.getAttribute('data-t');
+    /* retoucher l'onglet deja actif ramene a son accueil */
+    if(cible === tab){
+      if(tab === 'stock'){ stkSet = null; stkQry = ''; stkJournal = false; stkInv = false; stkNever = false; }
+      if(selMode) exitSel();
+      if(history.state && history.state.d === 3) history.back();
+    }
     for(var i=0;i<navs.length;i++) navs[i].classList.remove('on');
     this.classList.add('on');
-    tab = this.getAttribute('data-t');
+    tab = cible;
     if(tab !== 'stock'){ stkJournal = false; stkInv = false; stkNever = false; }
     if(tab !== 'stock' && stkSet){ stkSet = null; stkQry = ''; if(history.state && history.state.d === 3) history.back(); }
     $('fab').classList.toggle('hide', tab !== 'vitrine' && tab !== 'afaire');
@@ -2232,7 +2403,28 @@ window.addEventListener('online', function(){
 });
 
 /* ═══ BOOT ═══ */
-window.addEventListener('load', function(){
+/* Une session connue permet d'afficher l'interface immediatement. Sans ca,
+   l'ecran de connexion restait visible le temps de charger le script Google,
+   puis disparaissait : c'est ce va-et-vient qui produisait le scintillement. */
+(function(){
+  var connu = false;
+  try{
+    var st0 = JSON.parse(localStorage.getItem(LS + 'tk') || 'null');
+    connu = !!(st0 && st0.t && st0.e > Date.now() + 60000);
+    if(!connu){
+      var w0 = SOLO || localStorage.getItem(LS + 'who');
+      connu = !!(w0 && WHOS[w0]);
+    }
+  }catch(e){}
+  if(connu){
+    $('auth').classList.add('hide');
+    $('app').classList.remove('hide');
+  }
+})();
+
+/* le script Google n'a pas a attendre que toutes les images de la page soient
+   arrivees : on le lance des maintenant */
+(function(){
   var s = document.createElement('script');
   s.src = 'https://accounts.google.com/gsi/client';
   s.onload = function(){
@@ -2277,14 +2469,16 @@ window.addEventListener('load', function(){
       });
     }).catch(function(){});
   }
-});
+})();
 
 /* ===================== MODULE STOCK ===================== */
-var STK_FILE = 'pkstk.json';
-var MV_FILE  = 'pkstkmv.json';   /* journal a part : il grossit sans fin, le stock non */
+var STK_PREFIX = 'dvstk_';        /* un fichier de stock par appareil */
+var STK_LEGACY = 'dvstk.json';    /* ancien fichier unique : lu, jamais reecrit */
+var MV_PREFIX  = 'dvstkmv_';      /* journal a part : il grossit sans fin, le stock non */
+var MV_LEGACY  = 'dvstkmv.json';
 var MV_CAP   = 4000;             /* mouvements conserves */
-var CARDS_VER = '5';   /* fichiers cards/ et pks_names.json */
-var SETS_VER  = '6';   /* pks_sets.json seul, pour ne pas invalider les cartes deja en cache */
+var CARDS_VER = '7';   /* fichiers cards/ et pks_names.json */
+var SETS_VER  = '12';   /* pks_sets.json seul, pour ne pas invalider les cartes deja en cache */
 var VAR_LBL = { n:'Norm', r:'Rev', h:'Holo' };
 var VAR_FULL = { n:'Normale', r:'Reverse', h:'Holo' };
 var VAR_BIT = { n:1, r:2, h:4 };
@@ -2292,15 +2486,32 @@ var ETS = [['nm','Near Mint'],['jo','Joué'],['ab','Abîmé']];
 var ET_LBL = { nm:'NM', jo:'Joué', ab:'Abîmé' };
 
 var cdb = null, cdbById = {};
-var stock = {}, stkOv = {}, stkMoves = [], stkRev = 0;
+var stock = {}, stkOv = {}, stkMoves = [];
+var stkLayers = [];                 /* couches des autres appareils */
+var myDelta = {}, myOv = {}, myDone = {}, myStamp = 0;   /* notre contribution */
 var mvNew = [], mvCount = 0, mvFileId = null, mvLoaded = false, mvTimer = null, mvSaving = false;
-var stkFileId = null, stkBaseRev = 0, stkPending = [];
+var stkFileId = null, stkPending = [];
 var stkTimer = null, stkSaving = false, stkLoaded = false;
 var stkSet = null, stkLp = null, stkLpFired = false;
 var stkArr = [], stkQry = '', stkJournal = false, stkInv = false, stkNever = false;
 var stkDone = {}, doneDirty = {}, stkNet = false;
 var invDir = parseInt(localStorage.getItem(LS + 'invdir') || '-1', 10);   /* -1 decroissant, 1 croissant */
 var nvTri  = localStorage.getItem(LS + 'nvtri') || 'az';                 /* az | qty */
+/* nombre de colonnes de la grille, memorise separement pour ecran etroit et large */
+var stkCols = (function(){
+  try{ return JSON.parse(localStorage.getItem(LS + 'cols') || '{}') || {}; }catch(e){ return {}; }
+})();
+function largeEcran(){ return window.innerWidth >= 760; }
+function colsChoix(){ return largeEcran() ? [3,5,6,8,10] : [2,3,4]; }
+function colsNow(){
+  var d = largeEcran() ? 6 : 3;
+  var v = largeEcran() ? stkCols.w : stkCols.n;
+  return colsChoix().indexOf(v) >= 0 ? v : d;
+}
+function colsSet(v){
+  if(largeEcran()) stkCols.w = v; else stkCols.n = v;
+  try{ localStorage.setItem(LS + 'cols', JSON.stringify(stkCols)); }catch(e){}
+}
 var mvFilt = localStorage.getItem(LS + 'mvf') || 'lot';   /* all | lot */
 var stkFilt = localStorage.getItem(LS + 'filt') || 'all';   /* all | has | none */
 var stkTri  = localStorage.getItem(LS + 'tri')  || 'num';   /* num | qty */
@@ -2430,36 +2641,97 @@ function cardImgErr(img){
 }
 
 
-/* ---- persistance Drive ---- */
-async function stkFind(){
-  var url = 'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=50&fields=files(id,name)&q=' +
-    encodeURIComponent("name = '" + STK_FILE + "' and trashed=false");
+/* ---- persistance Drive : un fichier par appareil ----
+
+   Chaque appareil ecrit UNIQUEMENT son propre fichier, et n'y stocke pas des
+   quantites absolues mais la somme de ses propres gestes. La lecture additionne
+   tous les fichiers. Personne ne peut donc ecraser personne, et l'ordre des
+   enregistrements n'a aucune importance.
+
+   L'ancien fichier unique, s'il existe, est lu comme une couche de base
+   supplementaire et n'est jamais reecrit : rien n'est perdu ni migre.
+
+   Les corrections de variantes et les Pokemon marques « deja fait » ne sont pas
+   des compteurs mais des etats : pour eux, l'ecriture la plus recente gagne. */
+
+function devId(){
+  var d = null;
+  try{ d = localStorage.getItem(LS + 'dev'); }catch(e){}
+  if(!d){
+    d = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    try{ localStorage.setItem(LS + 'dev', d); }catch(e){}
+  }
+  return d;
+}
+var DEV = devId();
+var STK_MINE = STK_PREFIX + DEV + '.json';
+var MV_MINE  = MV_PREFIX  + DEV + '.json';
+
+async function driveList(prefix){
+  var url = 'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=100&fields=files(id,name)&q=' +
+    encodeURIComponent("name contains '" + prefix + "' and trashed=false");
+  var r = await api(url);
+  var j = await r.json();
+  return j.files || [];
+}
+async function driveFindExact(nom){
+  var url = 'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=10&fields=files(id,name)&q=' +
+    encodeURIComponent("name = '" + nom + "' and trashed=false");
   var r = await api(url);
   var j = await r.json();
   return (j.files && j.files[0]) ? j.files[0].id : null;
 }
-function stkApply(data){
-  stock = (data && data.stock) || {};
-  stkOv = (data && data.ov) || {};
-  stkDone = (data && data.done) || {};
-  for(var dk in doneDirty){ stkDone[dk] = doneDirty[dk]; }   /* nos marquages priment sur le distant */
-  stkRev = (data && data.rev) || 0;
-  mvCount = (data && data.mvCount) || 0;
-  stkBaseRev = stkRev;
-  /* migration : un ancien fichier porte encore le journal, on le bascule */
-  if(data && data.moves && data.moves.length){
-    mvNew = data.moves.concat(mvNew);
-    mvCount = Math.max(mvCount, data.moves.length);
-    mvQueue();
-  }
+async function driveRead(id){
+  var r = await api('https://www.googleapis.com/drive/v3/files/' + id + '?alt=media');
+  if(!r.ok) throw new Error('http ' + r.status);
+  return await r.json();
 }
-/* Cache local du stock : evite d'attendre Drive au premier acces a l'onglet.
-   L'identifiant du fichier est memorise aussi, ce qui supprime la requete
-   de recherche et donc un aller-retour complet. */
+async function driveWrite(id, nom, body){
+  if(!id){
+    var fd = new FormData();
+    fd.append('metadata', new Blob([JSON.stringify({ name: nom, parents: ['appDataFolder'] })], { type:'application/json' }));
+    fd.append('file', new Blob([body], { type:'application/json' }));
+    var r = await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method:'POST', body: fd });
+    return (await r.json()).id;
+  }
+  await api('https://www.googleapis.com/upload/drive/v3/files/' + id + '?uploadType=media', {
+    method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: body
+  });
+  return id;
+}
+
+/* recompose la vue du stock a partir des couches lues */
+function stkRebuild(){
+  stock = {};
+  for(var i=0;i<stkLayers.length;i++){
+    var d = stkLayers[i].delta || {};
+    for(var k in d) stock[k] = (stock[k] || 0) + d[k];
+  }
+  for(var k2 in myDelta) stock[k2] = (stock[k2] || 0) + myDelta[k2];
+  for(var k3 in stock) if(stock[k3] <= 0) delete stock[k3];
+}
+
+function stkApplyStates(){
+  /* etats : la couche la plus recemment ecrite gagne, la notre en dernier */
+  var best = null;
+  for(var i=0;i<stkLayers.length;i++){
+    var L = stkLayers[i];
+    if(!best || (L.stamp || 0) > (best.stamp || 0)) best = L;
+  }
+  stkOv = (best && best.ov) ? JSON.parse(JSON.stringify(best.ov)) : {};
+  stkDone = (best && best.done) ? JSON.parse(JSON.stringify(best.done)) : {};
+  if(myStamp >= ((best && best.stamp) || 0)){
+    for(var a in myOv) stkOv[a] = myOv[a];
+    for(var b in myDone){ if(myDone[b]) stkDone[b] = 1; else delete stkDone[b]; }
+  }
+  for(var dk in doneDirty){ if(doneDirty[dk]) stkDone[dk] = 1; else delete stkDone[dk]; }
+}
+
 function stkSaveCache(){
   try{
     localStorage.setItem(LS + 'stkc', JSON.stringify({
-      rev: stkRev, stock: stock, ov: stkOv, done: stkDone, mvCount: mvCount, id: stkFileId
+      mine: STK_MINE, layers: stkLayers, delta: myDelta, ov: myOv, done: myDone, stamp: myStamp,
+      mvCount: mvCount, id: stkFileId
     }));
   }catch(e){ /* quota plein : on s'en passe */ }
 }
@@ -2467,90 +2739,189 @@ function stkLoadCache(){
   try{
     var c = JSON.parse(localStorage.getItem(LS + 'stkc') || 'null');
     if(!c) return false;
-    if(c.id) stkFileId = c.id;
-    stock = c.stock || {};
-    stkOv = c.ov || {};
-    stkDone = c.done || {};
+    if(c.id && c.mine === STK_MINE) stkFileId = c.id;   /* jamais un identifiant herite */
+    stkLayers = c.layers || [];
+    myDelta = c.delta || {};
+    myOv = c.ov || {};
+    myDone = c.done || {};
+    myStamp = c.stamp || 0;
     mvCount = c.mvCount || 0;
-    stkRev = c.rev || 0;
-    stkBaseRev = stkRev;
+    stkRebuild();
+    stkApplyStates();
     return true;
   }catch(e){ return false; }
 }
 
-async function stkLoad(){
-  if(stkNet) return;                        /* deja lu depuis Drive */
-  var vuEnCache = stkLoaded ? true : stkLoadCache();
-  if(vuEnCache) stkLoaded = true;           /* affichage immediat, rafraichi juste apres */
-  if(!tokenValid()) return;                 /* pas de jeton : on retentera plus tard */
-  async function lire(id){
-    var r = await api('https://www.googleapis.com/drive/v3/files/' + id + '?alt=media');
-    if(!r.ok) throw new Error('http ' + r.status);
-    return await r.json();
+/* lecture reseau : recompose les couches depuis Drive */
+/* L'ancien fichier unique ne change jamais : une fois son emplacement connu,
+   inutile de le rechercher a chaque lecture. 'non' signifie qu'il n'existe pas. */
+function legacyId(){
+  try{ return localStorage.getItem(LS + 'oldstk'); }catch(e){ return null; }
+}
+function setLegacyId(v){
+  try{ localStorage.setItem(LS + 'oldstk', v || 'non'); }catch(e){}
+}
+
+async function stkFetch(){
+  /* Toutes les lectures en parallele : enchainees une par une, elles
+     cumulaient cinq a six allers-retours vers Drive. */
+  var pList = driveList(STK_PREFIX);
+  var old = legacyId();
+  var pOld = (old === 'non') ? Promise.resolve(null)
+           : (old ? Promise.resolve(old) : driveFindExact(STK_LEGACY).then(function(id){ setLegacyId(id); return id; }));
+
+  var files = await pList;
+  /* Drive peut remonter l'ancien fichier dans ce listage : sans dedoublonnage
+     il serait lu une seconde fois par la recherche explicite ci-dessous, et
+     ses quantites compteraient double. */
+  var vus = {};
+  var lectures = [];
+  for(var z=0;z<files.length;z++){
+    (function(f){
+      if(vus[f.id]) return;
+      vus[f.id] = 1;
+      lectures.push(driveRead(f.id).then(function(d){ return { f: f, d: d }; }, function(){ return null; }));
+    })(files[z]);
   }
+  var oldId = await pOld;
+  if(oldId && !vus[oldId]){
+    vus[oldId] = 1;
+    lectures.push(driveRead(oldId).then(function(d){ return { f: { id: oldId, name: STK_LEGACY }, d: d }; }, function(){ return null; }));
+  }
+
+  var res = await Promise.all(lectures);
+  var couches = [];
+  var mienId = null;
+  var pris = {};
+  for(var i=0;i<res.length;i++){
+    if(!res[i] || !res[i].d) continue;
+    var f = res[i].f, data = res[i].d;
+    /* securite : jamais deux fois le meme fichier, quelle qu'en soit la raison */
+    var cle = f.id || f.name;
+    if(pris[cle]) continue;
+    pris[cle] = 1;
+    if(f.name === STK_LEGACY){
+      couches.push({ dev: 'legacy', delta: data.stock || {},
+                     ov: data.ov || {}, done: data.done || {}, stamp: 0 });
+      if(data.moves && data.moves.length){ mvNew = data.moves.concat(mvNew); mvQueue(); }
+      continue;
+    }
+    if(f.name === STK_MINE){
+      mienId = f.id;
+      /* notre propre fichier : il fait foi sauf si des gestes sont en attente */
+      if(!stkPending.length){
+        myDelta = data.delta || {};
+        myOv = data.ov || {};
+        myDone = data.done || {};
+        myStamp = data.stamp || 0;
+      }
+      continue;
+    }
+    couches.push({ dev: data.dev || f.name, delta: data.delta || {},
+                   ov: data.ov || {}, done: data.done || {}, stamp: data.stamp || 0 });
+  }
+
+  /* ne prendre l'identifiant que s'il correspond bien a NOTRE fichier :
+     un identifiant herite d'une version anterieure pointerait sur l'ancien
+     fichier unique, et nos ecritures l'ecraseraient */
+  stkFileId = mienId;
+  stkLayers = couches;
+  stkRebuild();
+  stkApplyStates();
+  stkSaveCache();
+}
+
+async function stkLoad(){
+  if(stkNet) return;
+  var vuEnCache = stkLoaded ? true : stkLoadCache();
+  if(vuEnCache) stkLoaded = true;
+  if(!tokenValid()) return;
   try{
-    var data = null;
-    if(stkFileId){
-      /* identifiant memorise : peut etre perime si le fichier a ete recree */
-      try{ data = await lire(stkFileId); }
-      catch(e1){ stkFileId = null; }
-    }
-    if(data === null){
-      stkFileId = await stkFind();
-      if(stkFileId) data = await lire(stkFileId);
-    }
-    if(data){
-      /* ne pas ecraser des gestes faits pendant le chargement */
-      if(!stkPending.length) stkApply(data);
-      stkSaveCache();
-      if(vuEnCache && tab === 'stock') render();
-      stkNet = true;
-    }
+    await stkFetch();
+    if(vuEnCache && tab === 'stock') render();
     stkLoaded = true;
+    stkNet = true;
   }catch(e){
     if(!vuEnCache) toast('Stock : lecture impossible');
   }
 }
-function stkBody(){
-  return JSON.stringify({ rev: stkRev, stock: stock, ov: stkOv, done: stkDone, mvCount: mvCount, at: now(), v: APP_VERSION });
+
+/* Rafraichissement periodique. Sur Android une PWA n'est pas reellement
+   arretee : sans cela, un appareil ne relirait jamais ce que l'autre ecrit.
+   Le rendu n'est refait que si quelque chose a change, et dans une grille
+   seules les vignettes sont mises a jour, pour ne pas perdre le defilement. */
+var stkSyncing = false;
+async function stkSync(force){
+  if(stkSyncing || stkSaving || !stkLoaded || !tokenValid()) return;
+  if(!force && document.hidden) return;
+  stkSyncing = true;
+  try{
+    var avant = {};
+    for(var k in stock) avant[k] = stock[k];
+    await stkFetch();
+    /* ne rafraichir que les cartes reellement modifiees */
+    var touchees = {};
+    for(var k2 in stock) if(avant[k2] !== stock[k2]) touchees[k2.split('|')[0]] = 1;
+    for(var k3 in avant) if(!(k3 in stock)) touchees[k3.split('|')[0]] = 1;
+    var ids = Object.keys(touchees);
+    if(ids.length) stkTouchUI(ids);
+  }catch(e){}
+  stkSyncing = false;
 }
-async function stkWrite(){
-  var meta = { name: STK_FILE, parents: ['appDataFolder'] };
-  var fd = new FormData();
-  if(!stkFileId){
-    fd.append('metadata', new Blob([JSON.stringify(meta)], { type:'application/json' }));
-    fd.append('file', new Blob([stkBody()], { type:'application/json' }));
-    var r = await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method:'POST', body: fd });
-    stkFileId = (await r.json()).id;
-  } else {
-    await api('https://www.googleapis.com/upload/drive/v3/files/' + stkFileId + '?uploadType=media', {
-      method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: stkBody()
-    });
+/* Mise a jour sur place, jamais de rendu complet : recreer les elements
+   rechargerait images et symboles, ce qui provoque un scintillement. */
+function stkTouchUI(ids){
+  if(tab !== 'stock') return;
+  if(stkSet || stkInv){
+    for(var i=0;i<ids.length;i++) stkRefresh(ids[i]);
+    return;
   }
+  if(stkJournal || stkNever) return;   /* vues de consultation, relues a l'entree */
+  stkTouchSets();
 }
-/* garde-fou : si le fichier a bougé ailleurs, on rejoue nos mouvements dessus */
+
+/* liste des extensions : seuls les compteurs changent */
+function stkTouchSets(){
+  var per = {}, tot = 0;
+  for(var k in stock){
+    if(!stock[k]) continue;
+    tot += stock[k];
+    var p = k.split('|')[0], d = p.lastIndexOf('-');
+    var sid = rootSet(d > 0 ? p.slice(0, d) : p);
+    per[sid] = (per[sid] || 0) + stock[k];
+  }
+  var els = document.querySelectorAll('.stkSet[data-stkset]');
+  for(var i=0;i<els.length;i++){
+    var id = els[i].getAttribute('data-stkset'), n = per[id] || 0;
+    var sc = els[i].querySelector('.sc');
+    if(!sc) continue;
+    var txt = n ? String(n) : '—';
+    if(sc.textContent !== txt){
+      sc.textContent = txt;
+      sc.className = 'sc' + (n ? '' : ' z');
+    }
+  }
+  var cells = document.querySelectorAll('.stkTot .cell b');
+  if(cells[0] && cells[0].textContent !== String(tot)) cells[0].textContent = tot;
+  nvCountFill();
+}
+
+function stkBody(){
+  return JSON.stringify({
+    v: APP_VERSION, dev: DEV, at: now(), stamp: myStamp,
+    delta: myDelta, ov: myOv, done: myDone
+  });
+}
+
+/* Ecriture : uniquement notre fichier. Aucun autre appareil n'y touche,
+   il ne peut donc y avoir ni conflit ni perte. */
 async function stkSave(){
   if(stkSaving || !stkPending.length) return;
   stkSaving = true; setSync('busy');
   try{
-    if(stkFileId){
-      var r = await api('https://www.googleapis.com/drive/v3/files/' + stkFileId + '?alt=media');
-      var rem = await r.json().catch(function(){ return null; });
-      if(rem && (rem.rev || 0) !== stkBaseRev){
-        var mine = stkPending.slice();
-        stkApply(rem);
-        for(var i=0;i<mine.length;i++){
-          var m = mine[i], k = stkKey(m.c, m.v, m.e);
-          stock[k] = Math.max(0, (stock[k] || 0) + m.d);
-          stkMoves.push(m);
-        }
-        toast('Stock fusionné avec l\'autre appareil');
-      }
-    }
-    stkRev = stkBaseRev + 1;
-    await stkWrite();
-    stkBaseRev = stkRev;
-    stkPending = [];
+    var envoi = stkPending.length;
+    stkFileId = await driveWrite(stkFileId, STK_MINE, stkBody());
+    stkPending = stkPending.slice(envoi);
     doneDirty = {};
     stkSaveCache();
     setSync('ok');
@@ -2560,90 +2931,88 @@ async function stkSave(){
 }
 function stkQueue(){ clearTimeout(stkTimer); stkTimer = setTimeout(stkSave, 2500); }
 
-/* ---- journal : fichier separe, ecrit plus rarement ---- */
-async function mvFind(){
-  var url = 'https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=10&fields=files(id,name)&q=' +
-    encodeURIComponent("name = '" + MV_FILE + "' and trashed=false");
-  var r = await api(url);
-  var j = await r.json();
-  return (j.files && j.files[0]) ? j.files[0].id : null;
-}
-async function mvLoad(){
-  if(mvLoaded) return stkMoves;
-  var base = [];
-  try{
-    if(!mvFileId) mvFileId = await mvFind();
-    if(mvFileId){
-      var r = await api('https://www.googleapis.com/drive/v3/files/' + mvFileId + '?alt=media');
-      var j = await r.json();
-      base = (j && j.moves) || [];
-    }
-  }catch(e){ toast('Journal : lecture impossible'); }
-  /* mvNew contient ce qui n'est pas encore ecrit : eviter de le compter deux fois */
-  var seen = {};
-  for(var i=0;i<base.length;i++) seen[base[i].t + '|' + base[i].c + '|' + base[i].d] = 1;
-  var add = mvNew.filter(function(m){ return !seen[m.t + '|' + m.c + '|' + m.d]; });
-  stkMoves = base.concat(add);
-  stkMoves.sort(function(a, b){ return a.t - b.t; });
-  mvCount = Math.max(mvCount, stkMoves.length);
-  mvLoaded = true;
-  return stkMoves;
-}
-async function mvSave(){
-  if(mvSaving || !mvNew.length) return;
-  mvSaving = true;
-  var envoi = mvNew.slice();
-  try{
-    if(!mvFileId) mvFileId = await mvFind();
-    var base = [];
-    if(mvFileId){
-      try{
-        var r = await api('https://www.googleapis.com/drive/v3/files/' + mvFileId + '?alt=media');
-        var j = await r.json();
-        base = (j && j.moves) || [];
-      }catch(e){ base = []; }
-    }
-    var seen = {};
-    for(var i=0;i<base.length;i++) seen[base[i].t + '|' + base[i].c + '|' + base[i].d] = 1;
-    for(var k=0;k<envoi.length;k++){
-      var key = envoi[k].t + '|' + envoi[k].c + '|' + envoi[k].d;
-      if(!seen[key]){ base.push(envoi[k]); seen[key] = 1; }
-    }
-    base.sort(function(a, b){ return a.t - b.t; });
-    if(base.length > MV_CAP) base = base.slice(-MV_CAP);
-    var body = JSON.stringify({ moves: base, at: now(), v: APP_VERSION });
-    if(!mvFileId){
-      var fd = new FormData();
-      fd.append('metadata', new Blob([JSON.stringify({ name: MV_FILE, parents: ['appDataFolder'] })], { type:'application/json' }));
-      fd.append('file', new Blob([body], { type:'application/json' }));
-      var rr = await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method:'POST', body: fd });
-      mvFileId = (await rr.json()).id;
-    } else {
-      await api('https://www.googleapis.com/upload/drive/v3/files/' + mvFileId + '?uploadType=media', {
-        method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: body
-      });
-    }
-    mvNew = mvNew.slice(envoi.length);
-    mvCount = base.length + mvNew.length;
-    if(mvLoaded){ stkMoves = base.concat(mvNew); }
-  }catch(e){ /* on retentera : mvNew est conserve */ }
-  mvSaving = false;
-  if(mvNew.length) mvQueue();
-}
-function mvQueue(){ clearTimeout(mvTimer); mvTimer = setTimeout(mvSave, 20000); }
-
 function stkAdd(id, v, e, d, src){
   var k = stkKey(id, v, e), cur = stock[k] || 0, nv = Math.max(0, cur + d);
   if(nv === cur) return false;
+  var vrai = nv - cur;
   stock[k] = nv;
   if(!nv) delete stock[k];
-  var mv = { t: now(), c: id, v: v, e: e, d: nv - cur, w: who || '', s: src || 'saisie' };
+  myDelta[k] = (myDelta[k] || 0) + vrai;
+  if(!myDelta[k]) delete myDelta[k];
+  var mv = { t: now(), c: id, v: v, e: e, d: vrai, w: who || '', s: src || 'saisie' };
   stkPending.push(mv);
   mvNew.push(mv); mvCount++;
   if(mvLoaded) stkMoves.push(mv);
   stkQueue(); mvQueue(); stkSaveCache();
   return true;
 }
+
+/* ---- journal : un fichier par appareil, meme principe ---- */
+async function mvLoad(){
+  if(mvLoaded) return stkMoves;
+  var tout = [];
+  try{
+    var files = await driveList(MV_PREFIX);
+    for(var i=0;i<files.length;i++){
+      var f = files[i], j = null;
+      try{ j = await driveRead(f.id); }catch(e){ continue; }
+      if(f.name === MV_MINE) mvFileId = f.id;
+      if(j && j.moves) tout = tout.concat(j.moves);
+    }
+    /* ancien fichier unique */
+    try{
+      var oldId = await driveFindExact(MV_LEGACY);
+      if(oldId){
+        var v = await driveRead(oldId);
+        if(v && v.moves) tout = tout.concat(v.moves);
+      }
+    }catch(e){}
+  }catch(e){ toast('Journal : lecture impossible'); }
+
+  var vus = {};
+  for(var z=0;z<tout.length;z++) vus[tout[z].t + '|' + tout[z].c + '|' + tout[z].d] = 1;
+  for(var n=0;n<mvNew.length;n++){
+    var m = mvNew[n], cle = m.t + '|' + m.c + '|' + m.d;
+    if(!vus[cle]){ tout.push(m); vus[cle] = 1; }
+  }
+  tout.sort(function(a, b){ return a.t - b.t; });
+  stkMoves = tout;
+  mvCount = Math.max(mvCount, tout.length);
+  mvLoaded = true;
+  return stkMoves;
+}
+
+/* Ecriture : uniquement notre fichier, en ajoutant nos nouveaux mouvements
+   a ceux qu'il contient deja. */
+async function mvSave(){
+  if(mvSaving || !mvNew.length) return;
+  mvSaving = true;
+  var envoi = mvNew.slice();
+  try{
+    if(!mvFileId) mvFileId = await driveFindExact(MV_MINE);
+    var base = [];
+    if(mvFileId){
+      try{ var j = await driveRead(mvFileId); base = (j && j.moves) || []; }
+      catch(e){ base = []; }
+    }
+    var vus = {};
+    for(var i=0;i<base.length;i++) vus[base[i].t + '|' + base[i].c + '|' + base[i].d] = 1;
+    for(var k=0;k<envoi.length;k++){
+      var cle = envoi[k].t + '|' + envoi[k].c + '|' + envoi[k].d;
+      if(!vus[cle]){ base.push(envoi[k]); vus[cle] = 1; }
+    }
+    base.sort(function(a, b){ return a.t - b.t; });
+    if(base.length > MV_CAP) base = base.slice(-MV_CAP);
+    mvFileId = await driveWrite(mvFileId, MV_MINE,
+      JSON.stringify({ moves: base, dev: DEV, at: now(), v: APP_VERSION }));
+    mvNew = mvNew.slice(envoi.length);
+  }catch(e){ /* on retentera : mvNew est conserve */ }
+  mvSaving = false;
+  if(mvNew.length) mvQueue();
+}
+function mvQueue(){ clearTimeout(mvTimer); mvTimer = setTimeout(mvSave, 20000); }
+
+
 function stkSetOv(id, mask){
   if(mask) stkOv[id] = mask; else delete stkOv[id];
   stkQueue();
@@ -2701,6 +3070,27 @@ async function hardReload(){
   location.replace(location.pathname + '?maj=' + Date.now());
 }
 
+/* Sur tablette, #view devient une grille multi-colonnes destinee aux vignettes
+   de lots. Tout le contenu du Stock passe donc par un conteneur unique qui
+   occupe toute la largeur, et gere sa propre mise en page. */
+/* hauteur reelle de l'en-tete, pour que le bandeau d'extension se colle
+   juste dessous quel que soit son contenu */
+function majHdrH(){
+  var e = document.querySelector('header');
+  if(!e) return;
+  /* hauteur fractionnaire : offsetHeight arrondit, et le demi-pixel d'ecart
+     fait vibrer le bandeau pendant le defilement */
+  var hh = e.getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--hdrH', Math.floor(hh) + 'px');
+}
+window.addEventListener('resize', majHdrH);
+window.addEventListener('orientationchange', function(){ setTimeout(majHdrH, 250); });
+
+function stkView(html){
+  $('view').innerHTML = '<div class="stkWrap">' + html + '</div>';
+  majHdrH();
+}
+
 function stkPreload(){
   if(stkPreloaded) return;
   cdbLoad().catch(function(){});
@@ -2718,13 +3108,13 @@ async function renderStock(){
     var p = cdbLoad().catch(function(){ return null; });
     var vite = await Promise.race([p, new Promise(function(r){ setTimeout(function(){ r('lent'); }, 250); })]);
     if(vite === 'lent' && !cdb){
-      $('view').innerHTML = '<div class="ph">Chargement des extensions…</div>';
+      stkView('<div class="ph">Chargement des extensions…</div>');
       try{ await p; }catch(e){}
     }
-    if(!cdb){ $('view').innerHTML = empty(EMPTY_CMD, 'Liste des extensions indisponible.'); return; }
+    if(!cdb){ stkView(empty(EMPTY_CMD, 'Liste des extensions indisponible.')); return; }
   }
   if(!stkLoaded) await stkLoad();
-  if(stkNever) return stkRenderNever();
+  else stkSync();                      /* relire en arriere-plan a chaque entree */
   if(stkInv) return stkRenderInv();
   if(stkJournal) return stkRenderJournal();
   if(stkSet) return stkRenderGrid();      /* la recherche se fait dans l'extension */
@@ -2756,6 +3146,7 @@ function stkRenderSets(){
     var rt = rootSet(sk);
     if(rt !== sk){ per[rt] = (per[rt] || 0) + per[sk]; per[sk] = 0; }
   }
+  h += '<div class="stkSets">';
   var cur = null;
   for(var i=0;i<cdb.sets.length;i++){
     var st = cdb.sets[i];
@@ -2766,7 +3157,7 @@ function stkRenderSets(){
          '<div class="sinfo"><b>' + esc(st.name) + '</b>' + codeHtml(st) + '</div>' +
          '<span class="sc' + (n ? '' : ' z') + '">' + (n ? n : '—') + '</span></div>';
   }
-  $('view').innerHTML = h;
+  stkView(h + '</div>');
   nvCountFill();
 }
 
@@ -2830,9 +3221,9 @@ async function stkRenderGrid(){
   var parts = [sid].concat(subsOf(sid));
   var todo = parts.filter(function(x){ return !setCards[x]; });
   if(todo.length){
-    $('view').innerHTML = head('chargement…') + '<div class="ph">Chargement des cartes…</div>';
+    stkView(head('chargement…') + '<div class="ph">Chargement des cartes…</div>');
     try{ await Promise.all(todo.map(setLoad)); }
-    catch(e){ $('view').innerHTML = head('erreur') + empty(EMPTY_CMD, 'Cartes indisponibles.'); return; }
+    catch(e){ stkView(head('erreur') + empty(EMPTY_CMD, 'Cartes indisponibles.')); return; }
     if(stkSet !== sid || tab !== 'stock' || query()) return;   /* l'utilisateur est parti entre-temps */
   }
   var arr = [];
@@ -2843,19 +3234,22 @@ async function stkRenderGrid(){
   stkArr = arr;
 
   function seg(attr, val, cur, lbl){
-    return '<button class="' + (cur === val ? 'on' : '') + '" data-' + attr + '="' + val + '">' + lbl + '</button>';
+    return '<button class="' + (String(cur) === String(val) ? 'on' : '') + '" data-' + attr + '="' + val + '">' + lbl + '</button>';
   }
+  var ch = colsChoix(), cn = colsNow(), colBtns = '';
+  for(var ci=0;ci<ch.length;ci++) colBtns += seg('stkcol', ch[ci], cn, String(ch[ci]));
   var bar = '<div class="stkFB"><div class="sg">' +
     seg('stkf','all',stkFilt,'Toutes') + seg('stkf','has',stkFilt,'J\'en ai') + seg('stkf','none',stkFilt,'Manquantes') +
     '</div><div class="sg">' +
     seg('stkt','num',stkTri,'N°') + seg('stkt','qty',stkTri,'Quantité') +
-    '</div></div>';
+    '</div></div>' +
+    '<div class="stkFB"><div class="sg cols">' + colBtns + '</div></div>';
 
   var srch = '<div class="stkSrch"><input type="search" id="stkq" placeholder="Chercher dans cette extension…"' + noAuto() + ' value="' + esc(stkQry) + '">' +
              (stkQry ? '<button class="sx" id="stkqx" aria-label="Effacer">×</button>' : '') + '</div>';
 
   var sub = arr.length + ' cartes · ' + poss + ' possédées · ' + tot + ' en stock';
-  $('view').innerHTML = head(sub) + srch + bar + '<div id="stkgrid"></div>';
+  stkView(head(sub) + srch + bar + '<div id="stkgrid"></div>');
   stkGridFill();
 
   var inp = $('stkq');
@@ -2915,22 +3309,23 @@ function stkGridFill(){
                               : 'Tu as toutes les cartes de cette extension.')) + '</div>';
     return;
   }
-  var h = '<div class="stkGrid">';
+  var nc = colsNow();
+  var h = '<div class="stkGrid' + (nc >= 8 ? ' dense' : '') + '" style="--cols:' + nc + '">';
   for(var k=0;k<vue.length;k++) h += stkTile(vue[k]);
   g.innerHTML = h + '</div>';
 }
 
 async function stkRenderSearch(q){
   var n = norm(q);
-  if(n.length < 2){ $('view').innerHTML = '<div class="ph">Tape au moins deux lettres.</div>'; return; }
+  if(n.length < 2){ stkView('<div class="ph">Tape au moins deux lettres.</div>'); return; }
   if(!nameIdx){
-    $('view').innerHTML = '<div class="ph">Chargement de l\'index…</div>';
-    try{ await namesLoad(); }catch(e){ $('view').innerHTML = empty(EMPTY_CMD, 'Recherche indisponible.'); return; }
+    stkView('<div class="ph">Chargement de l\'index…</div>');
+    try{ await namesLoad(); }catch(e){ stkView(empty(EMPTY_CMD, 'Recherche indisponible.')); return; }
     if(norm(query()) !== n || tab !== 'stock') return;
   }
   var ids = [];
   for(var nm in nameIdx){ if(nm.indexOf(n) >= 0){ ids = ids.concat(nameIdx[nm]); if(ids.length > 900) break; } }
-  if(!ids.length){ $('view').innerHTML = noHit(EMPTY_CMD, 'ce Pokémon'); return; }
+  if(!ids.length){ stkView(noHit(EMPTY_CMD, 'ce Pokémon')); return; }
 
   /* ne charger que les extensions reellement concernees */
   var need = {}, sids = [];
@@ -2940,7 +3335,7 @@ async function stkRenderSearch(q){
   }
   var missing = sids.filter(function(s){ return !setCards[s]; });
   if(missing.length){
-    $('view').innerHTML = '<div class="ph">Recherche dans ' + sids.length + ' extensions…</div>';
+    stkView('<div class="ph">Recherche dans ' + sids.length + ' extensions…</div>');
     try{ await Promise.all(missing.map(setLoad)); }catch(e){}
     if(norm(query()) !== n || tab !== 'stock') return;
   }
@@ -2950,7 +3345,7 @@ async function stkRenderSearch(q){
   var withQ = cards.filter(function(c){ return stkCardQ(c.i) > 0; });
   var LIM = 400, coupe = cards.length > LIM;
   var show = cards.slice(0, LIM);          /* toujours tout, possede ou non */
-  if(!show.length){ $('view').innerHTML = noHit(EMPTY_CMD, 'ce Pokémon'); return; }
+  if(!show.length){ stkView(noHit(EMPTY_CMD, 'ce Pokémon')); return; }
 
   var order = [], grp = {};
   for(var m=0;m<cdb.sets.length;m++) if(!cdb.sets[m].parent) order.push(cdb.sets[m].id);
@@ -2975,6 +3370,7 @@ async function stkRenderSearch(q){
     h += '<div class="stkWarn">Aucun exemplaire en stock pour ce nom.</div>';
   }
   if(coupe) h += '<div class="stkWarn">' + cards.length + ' cartes correspondent, seules les ' + LIM + ' premières sont affichées. Affine la recherche.</div>';
+  h += '<div class="stkRows">';
   for(var o=0;o<order.length;o++){
     var a = grp[order[o]];
     if(!a) continue;
@@ -2994,7 +3390,7 @@ async function stkRenderSearch(q){
            '<div class="rq">' + stkCardQ(c2.i) + '</div></div>';
     }
   }
-  $('view').innerHTML = h;
+  stkView(h);
 }
 
 /* ---- inventaire complet : toutes les cartes possedees ---- */
@@ -3012,11 +3408,11 @@ async function stkRenderInv(){
   }
   var keys = Object.keys(ids);
   if(!keys.length){
-    $('view').innerHTML = head('vide') + '<div class="pkE">Aucune carte en stock pour l\'instant.</div>';
+    stkView(head('vide') + '<div class="pkE">Aucune carte en stock pour l\'instant.</div>');
     return;
   }
 
-  $('view').innerHTML = head('chargement…');
+  stkView(head('chargement…'));
   try{ await ensureCards(keys); }catch(e){}
   if(!stkInv || tab !== 'stock') return;
 
@@ -3050,11 +3446,11 @@ async function stkRenderInv(){
       h += '<div class="stkSerie">' + esc(cdb.sets[s].name) + ' · ' + st + '</div>' + invRows(a);
     }
   }
-  $('view').innerHTML = h;
+  stkView(h);
 }
 
 function invRows(arr){
-  var h = '';
+  var h = '<div class="stkRows">';
   for(var z=0;z<arr.length;z++){
     var c = arr[z], vs = stkVars(c), det = [];
     for(var v=0;v<vs.length;v++){
@@ -3067,7 +3463,7 @@ function invRows(arr){
          '<div class="rvs">' + stkChips(c) + '</div></div>' +
          '<div class="rq">' + stkCardQ(c.i) + '</div></div>';
   }
-  return h;
+  return h + '</div>';
 }
 
 /* Le compte des Pokemon jamais faits a besoin des noms de cartes, donc des
@@ -3133,10 +3529,10 @@ async function stkRenderNever(){
   var keys = [];
   for(var k in stock) if(stock[k]) keys.push(k);
   if(!keys.length){
-    $('view').innerHTML = head('vide') + '<div class="pkE">Aucune carte en stock pour l\'instant.</div>';
+    stkView(head('vide') + '<div class="pkE">Aucune carte en stock pour l\'instant.</div>');
     return;
   }
-  $('view').innerHTML = head('chargement…');
+  stkView(head('chargement…'));
   try{ await ensureCards(keys); }catch(e){}
   if(!stkNever || tab !== 'stock') return;
 
@@ -3157,6 +3553,7 @@ async function stkRenderNever(){
   if(!liste.length){
     h += '<div class="pkE">Tous les Pokémon de ton stock ont déjà fait l\'objet d\'un lot.</div>';
   }
+  h += '<div class="stkRows">';
   for(var i=0;i<liste.length;i++){
     var p = liste[i], nc = Object.keys(p.cartes).length;
     h += '<div class="nvRow">' + cardImg(p.img, '') +
@@ -3164,6 +3561,7 @@ async function stkRenderNever(){
          ' · ' + p.ex + ' exemplaire' + (p.ex > 1 ? 's' : '') + '</small></div>' +
          '<button class="nvOk" data-nvd="' + esc(p.n) + '">Déjà fait</button></div>';
   }
+  h += '</div>';
 
   if(nFaits){
     h += '<div class="pkH">Marqués comme faits (' + nFaits + ')</div>';
@@ -3179,7 +3577,7 @@ async function stkRenderNever(){
            '<button class="nvOk" data-nvu="' + esc(noms[j]) + '">Annuler</button></div>';
     }
   }
-  $('view').innerHTML = h;
+  stkView(h);
 }
 
 /* ---- journal des mouvements ---- */
@@ -3192,12 +3590,12 @@ async function stkRenderJournal(){
            '<div class="stkTit">Mouvements de stock<small>' + sub + '</small></div></div>';
   }
   if(!mvLoaded){
-    $('view').innerHTML = head('chargement…');
+    stkView(head('chargement…'));
     await mvLoad();
     if(!stkJournal || tab !== 'stock') return;
   }
   if(!stkMoves.length){
-    $('view').innerHTML = head('aucun mouvement') + '<div class="pkE">Rien n\'a encore été saisi.</div>';
+    stkView(head('aucun mouvement') + '<div class="pkE">Rien n\'a encore été saisi.</div>');
     return;
   }
 
@@ -3216,7 +3614,7 @@ async function stkRenderJournal(){
     '</div></div>';
 
   var keys = list.map(function(m){ return m.c; });
-  $('view').innerHTML = head('chargement…') + bar;
+  stkView(head('chargement…') + bar);
   await ensureCards(keys);
   if(!stkJournal || tab !== 'stock') return;
 
@@ -3225,7 +3623,7 @@ async function stkRenderJournal(){
   var h = head(sub) + bar, jour = null;
 
   if(!list.length){
-    $('view').innerHTML = h + '<div class="pkE">Aucun mouvement lié à un lot pour l\'instant. Les cartes piochées ou remises apparaîtront ici.</div>';
+    stkView(h + '<div class="pkE">Aucun mouvement lié à un lot pour l\'instant. Les cartes piochées ou remises apparaîtront ici.</div>');
     return;
   }
 
@@ -3249,7 +3647,7 @@ async function stkRenderJournal(){
          '<small>' + esc(det.join(' · ')) + '</small></span>' +
          '<span class="mh">' + hh + (m.w ? ' · ' + esc(m.w) : '') + '</span></div>';
   }
-  $('view').innerHTML = h;
+  stkView(h + '</div>');
 }
 
 /* ---- panneau détail carte ---- */
@@ -3360,6 +3758,15 @@ function stkBind(){
       else { stkJournal = false; window.scrollTo(0,0); render(); }
       return;
     }
+    if((t = e.target.closest('[data-stkcol]'))){
+      colsSet(parseInt(t.getAttribute('data-stkcol'), 10));
+      var gc = t.closest('.sg');
+      if(gc){
+        var bc = gc.querySelectorAll('[data-stkcol]');
+        for(var zc=0;zc<bc.length;zc++) bc[zc].classList.toggle('on', bc[zc].getAttribute('data-stkcol') === String(colsNow()));
+      }
+      stkGridFill(); return;
+    }
     if((t = e.target.closest('[data-stkf]'))){
       stkFilt = t.getAttribute('data-stkf');
       localStorage.setItem(LS + 'filt', stkFilt);
@@ -3389,7 +3796,7 @@ function stkBind(){
     if((t = e.target.closest('[data-stkv]'))){
       if(stkLpFired){ stkLpFired = false; return; }
       var p = t.getAttribute('data-stkv').split('|');
-      if(stkAdd(p[0], p[1], 'nm', 1)) stkRefresh(p[0]);
+      if(stkAdd(p[0], p[1], 'nm', 1)) majCompteur(t, p[0], p[1]);
       return;
     }
     if((t = e.target.closest('.stkRow[data-stkid]'))){ sheetStkCard(t.getAttribute('data-stkid')); return; }
@@ -3413,7 +3820,7 @@ function stkBind(){
       var p = t.getAttribute('data-stkv').split('|');
       var et = 'nm';
       for(var i=0;i<ETS.length;i++) if(stkQ(p[0], p[1], ETS[i][0]) > 0){ et = ETS[i][0]; break; }
-      if(stkAdd(p[0], p[1], et, -1)){ if(navigator.vibrate) navigator.vibrate(18); stkRefresh(p[0]); }
+      if(stkAdd(p[0], p[1], et, -1)){ if(navigator.vibrate) navigator.vibrate(18); majCompteur(t, p[0], p[1]); }
     }, 420);
   }, { passive:true });
   ['touchend','touchmove','touchcancel'].forEach(function(ev){
@@ -3469,14 +3876,49 @@ function stkBind(){
 }
 
 /* met à jour la vignette concernée sans re-rendre toute la grille */
+/* Met a jour le compteur sur lequel on vient d'appuyer. On tient deja
+   l'element : aucune recherche dans la page, donc rien qui puisse echouer.
+   Le reste de la vignette est rafraichi ensuite, sans consequence si ca rate. */
+function majCompteur(el, id, v){
+  try{
+    var q = stkVarQ(id, v);
+    var n = el.querySelector('.vq');
+    if(n) n.textContent = q;
+    el.classList.toggle('on', q > 0);
+    el.classList.toggle('q0', q === 0);
+    var tuile = el.closest('.stkC');
+    if(tuile) tuile.classList.toggle('has', stkCardQ(id) > 0);
+    var ligne = el.closest('.stkRow');
+    if(ligne){
+      var rq = ligne.querySelector('.rq');
+      if(rq) rq.textContent = stkCardQ(id);
+    }
+  }catch(e){}
+  stkRefresh(id);
+}
+
 function stkRefresh(id){
   var c = cdbById[id];
   if(!c) return;
-  var el = document.querySelector('.stkC[data-stkid="' + id.replace(/"/g,'') + '"]');
+  var sel = '[data-stkid="' + String(id).replace(/["\\]/g,'') + '"]';
+  var el = document.querySelector('.stkC' + sel);
   if(el){
-    var tmp = document.createElement('div');
-    tmp.innerHTML = stkTile(c);
-    el.replaceWith(tmp.firstChild);
+    /* Chemin rapide : mise a jour sur place, car remplacer la vignette
+       rechargerait l'image et ferait scintiller. On verifie ensuite que
+       l'affichage correspond vraiment au stock ; sinon on redessine la
+       grille, pour qu'un compteur ne puisse jamais rester fige. */
+    var ok = false;
+    try{
+      var vs0 = el.querySelector('.vs');
+      if(vs0){
+        vs0.innerHTML = stkChips(c);
+        var attendu = String(stkVarQ(id, stkVars(c)[0]));
+        var lu = vs0.querySelector('.vq');
+        ok = !!lu && lu.textContent === attendu;
+      }
+      el.classList.toggle('has', stkCardQ(id) > 0);
+    }catch(e){ ok = false; }
+    if(!ok && typeof stkGridFill === 'function') stkGridFill();
     return;
   }
   var row = document.querySelector('.stkRow[data-stkid="' + id.replace(/"/g,'') + '"]');
